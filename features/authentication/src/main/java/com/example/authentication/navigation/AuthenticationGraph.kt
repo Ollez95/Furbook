@@ -9,7 +9,7 @@ import com.example.navigation.Navigator
 
 fun NavGraphBuilder.authenticationGraph(navigator: Navigator) {
     composable<AuthenticationNavigation.Login> {
-        LoginScreen(navigator = navigator)
+        LoginScreen()
     }
     composable<AuthenticationNavigation.Register> {
         RegisterScreen(navigator = navigator)

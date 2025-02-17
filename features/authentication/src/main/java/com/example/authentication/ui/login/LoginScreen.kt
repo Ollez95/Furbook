@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,22 +38,53 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.authentication.ui.composables.RegisterText
+import com.example.navigation.AuthenticationNavigation
+import com.example.navigation.Navigator
 import com.example.ui.composables.Logo
 import com.example.ui.composables.WaveBackground
 import com.example.ui.theme.FurbookTheme
 
 @Composable
-fun LoginScreen() {
-    var email by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
-    var passwordVisible by remember { mutableStateOf(false) }
+fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(),
+                navigator: Navigator) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                LoginEvent.LoginSuccess -> {
+                    // Handle successful login navigation
+                    navigator.navigateToDestinationCleaningStack(AuthenticationNavigation.Login)
+                }
+                is LoginEvent.Error -> {
+                    // Show error message (e.g., using Snackbar)
+                }
+                LoginEvent.SignUp -> {
+                    navigator.navigateToDestinationCleaningStack(AuthenticationNavigation.Register)
+                }
+                LoginEvent.ForgotPassword -> {
+                    navigator.navigateToDestinationCleaningStack(AuthenticationNavigation.ForgotPassword(state.email))
+                }
+                // Handle other events if needed
+                else -> {}
+            }
+        }
+    }
+
+    LoginContent(state = state, onEvent = { event ->
+        viewModel.onEvent(event)
+    })
+}
+
+@Composable
+fun LoginContent(state: LoginState, onEvent: (LoginEvent) -> Unit = {}) {
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -77,8 +109,8 @@ fun LoginScreen() {
 
                 // ✅ Email Field
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = state.email,
+                    onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
                     label = { Text("Email") },
                     leadingIcon = {
                         Icon(
@@ -97,8 +129,8 @@ fun LoginScreen() {
 
                 // ✅ Password Field
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = state.password,
+                    onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
                     label = { Text("Password") },
                     leadingIcon = {
                         Icon(
@@ -108,13 +140,13 @@ fun LoginScreen() {
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                     singleLine = true,
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        IconButton(onClick = { onEvent(LoginEvent.PasswordVisibilityChanged(!state.isPasswordVisible)) }) {
                             Icon(
-                                imageVector = if (passwordVisible) Icons.Default.Visibility
+                                imageVector = if (state.isPasswordVisible) Icons.Default.Visibility
                                 else Icons.Default.VisibilityOff,
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                contentDescription = if (state.isPasswordVisible) "Hide password" else "Show password"
                             )
                         }
                     },
@@ -127,7 +159,7 @@ fun LoginScreen() {
 
                 // ✅ Login Button
                 Button(
-                    onClick = { /* Handle Login */ },
+                    onClick = { onEvent(LoginEvent.Login) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp),
@@ -140,14 +172,14 @@ fun LoginScreen() {
 
                 // ✅ Forgot Password & Register Navigation
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    TextButton(onClick = { /* Handle Forgot Password */ }) {
+                    TextButton(onClick = { onEvent(LoginEvent.ForgotPassword) }) {
                         Text("FORGOT PASSWORD ?", fontSize = 14.sp, color = Color.Gray)
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // ✅ Fix alignment of "Don't have an account? Register"
-                    RegisterText(navigateToRegister = { /* Handle Register */ })
+                    RegisterText(navigateToRegister = { onEvent(LoginEvent.SignUp) })
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -187,6 +219,9 @@ fun LoginScreen() {
 @Composable
 private fun LoginScreenPreview() {
     FurbookTheme {
-        LoginScreen()
+        LoginContent(
+            state = LoginState(email = "test@example.com"),  // Example state
+            onEvent = {}  // Empty handler for preview
+        )
     }
 }

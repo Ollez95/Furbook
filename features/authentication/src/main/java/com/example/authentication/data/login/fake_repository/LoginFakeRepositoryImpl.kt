@@ -14,9 +14,9 @@ class LoginFakeRepositoryImpl: LoginRepository {
         delay(2000) // Simulating network delay
 
         if (email == "user@example.com" && password == "password123") {
-            emit(Response.Success(LOGIN_SUCCESSFUL)) // ✅ Success response
+            emit(Response.Success(LOGIN_SUCCESSFUL))
         } else {
-            emit(Response.Error(INVALID_CREDENTIALS)) // ❌ Error response
+            emit(Response.Error(INVALID_CREDENTIALS))
         }
     }
 }

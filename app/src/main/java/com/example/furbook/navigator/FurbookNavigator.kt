@@ -10,6 +10,7 @@ class FurbookNavigator(private val navController: NavController) : Navigator {
             popUpTo(navController.currentBackStackEntry?.destination?.route ?: return@navigate) { inclusive = true }
             launchSingleTop = true
         }
+
     }
 
     override fun navigateBack() {

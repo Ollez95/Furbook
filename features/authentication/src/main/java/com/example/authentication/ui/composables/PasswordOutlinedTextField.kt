@@ -46,10 +46,14 @@ fun PasswordOutlinedTextField(modifier: Modifier = Modifier, state: LoginState, 
 }
 
 @Composable
-fun PasswordWithoutIconOutlinedTextField(modifier: Modifier = Modifier, label: String) {
+fun PasswordWithoutIconOutlinedTextField(
+    value: String,
+    modifier: Modifier = Modifier,
+    label: String,
+    onChange: (String) -> Unit,) {
     OutlinedTextField(
-        value = "",
-        onValueChange = { },
+        value = value,
+        onValueChange = { onChange(it) },
         label = { Text(label) },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
         singleLine = true,

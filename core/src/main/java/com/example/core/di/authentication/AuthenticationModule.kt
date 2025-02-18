@@ -1,9 +1,7 @@
 package com.example.core.di.authentication
 
-import com.example.core.data.authentication.login.fake_repository.LoginFakeRepositoryImpl
-import com.example.core.data.authentication.register.fake_repository.RegisterFakeRepositoryImpl
-import com.example.core.domain.authentication.login.repository.LoginRepository
-import com.example.core.domain.authentication.register.repository.RegisterRepository
+import com.example.core.data.authentication.fake_repository.AuthenticationFakeRepositoryImpl
+import com.example.core.domain.authentication.repository.AuthenticationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,10 +14,6 @@ object AuthenticationModule {
 
     @Provides
     @Singleton
-    fun provideLoginRepository(): LoginRepository = LoginFakeRepositoryImpl()
-
-    @Provides
-    @Singleton
-    fun provideRegisterRepository(): RegisterRepository = RegisterFakeRepositoryImpl()
+    fun provideAuthenticationRepository(): AuthenticationRepository = AuthenticationFakeRepositoryImpl()
 }
 

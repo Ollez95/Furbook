@@ -20,5 +20,5 @@ sealed class AuthenticationNavigation : NavigationDestination {
     data object Login : AuthenticationNavigation()
 
     @Serializable
-    data class ForgotPassword(val email: String = "") : AuthenticationNavigation()
+    data class RecoverPassword(val email: String = "") : AuthenticationNavigation()
 }

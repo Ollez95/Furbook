@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -55,8 +58,7 @@ fun LoginScreen(
                 LoginEvent.LoginSuccess -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
                 is LoginEvent.LoginError -> state.snackBarHostState.showSnackbar(event.message)
                 LoginEvent.NavigateToSignUp -> navigator.navigateWithSafety(AuthenticationNavigation.Register)
-                LoginEvent.NavigateToForgotPassword -> navigator.navigateWithSafety(AuthenticationNavigation.ForgotPassword(state.loginModel.email))
-                else -> { /* Handle other events */ }
+                LoginEvent.NavigateToForgotPassword -> navigator.navigateWithSafety(AuthenticationNavigation.RecoverPassword(state.loginModel.email))
             }
         }
     }
@@ -99,7 +101,18 @@ private fun LoginContent(state: LoginState, onEvent: (LoginEvent) -> Unit = {}) 
                     .padding(horizontal = 32.dp)
 
                 // ✅ Email Field
-                EmailOutlinedTextField(modifier = modifierTextField, state) { onEvent(it) }
+                EmailOutlinedTextField(
+                    modifier = modifierTextField,
+                    value = state.loginModel.email,
+                    label = "Email",
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Email, // Replace with an email icon
+                            contentDescription = "Email Icon"
+                        )
+                    },
+                    onChange = { onEvent(LoginEvent.EmailChanged(it)) } // ✅ Explicitly wrap in event
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 

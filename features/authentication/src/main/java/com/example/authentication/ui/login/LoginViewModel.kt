@@ -2,7 +2,7 @@ package com.example.authentication.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.domain.authentication.login.repository.LoginRepository
+import com.example.core.domain.authentication.login.usecase.LoginAccountUseCase
 import com.example.core.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val repository: LoginRepository,
+    private val getLoginAccountUseCase: LoginAccountUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -41,7 +41,7 @@ class LoginViewModel @Inject constructor(
 
     private fun login(email: String, password: String) {
         viewModelScope.launch {
-            repository.login(email, password).collectLatest { response ->
+            getLoginAccountUseCase.invoke(email, password).collectLatest { response ->
                 when (response) {
                     is Response.Loading -> {
                         _state.update { it.copy(isLoading = true) }

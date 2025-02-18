@@ -37,8 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.Navigator
-import com.example.onboarding.data.local.OnBoardingFakeData
-import com.example.onboarding.data.model.OnBoardingModel
+import com.example.core.data.onboarding.local.OnBoardingFakeData
+import com.example.core.data.onboarding.model.OnBoardingModel
 import com.example.ui.theme.FurbookTheme
 import com.example.ui.theme.Space.space2XSmall
 import com.example.ui.theme.Space.spaceLarge

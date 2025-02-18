@@ -12,12 +12,12 @@ fun NavGraphBuilder.authenticationGraph(navigator: Navigator) {
         LoginScreen(navigator = navigator)
     }
     composable<AuthenticationNavigation.Register> {
-        RegisterScreen(navigator = navigator)
+        RegisterScreen()
     }
     composable<AuthenticationNavigation.ForgotPassword> {
-        RegisterScreen(navigator = navigator)
+        RegisterScreen()
     }
     composable<AuthenticationNavigation.Register> {
-        RegisterScreen(navigator = navigator)
+        RegisterScreen()
     }
 }

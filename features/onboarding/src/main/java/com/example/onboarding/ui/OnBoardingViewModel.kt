@@ -2,7 +2,7 @@ package com.example.onboarding.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.onboarding.domain.repository.OnBoardingRepository
+import com.example.core.domain.onboarding.repository.OnBoardingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

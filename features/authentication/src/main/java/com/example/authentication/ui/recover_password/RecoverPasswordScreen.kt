@@ -29,9 +29,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.authentication.ui.composables.EmailOutlinedTextField
-import com.example.authentication.ui.login.LoginEvent
-import com.example.authentication.ui.login.LoginState
-import com.example.core.domain.authentication.login.models.LoginModel
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.Navigator
 import com.example.ui.composables.WaveBackground
@@ -41,7 +38,7 @@ import com.example.ui.theme.FurbookTheme
 fun RecoverPasswordScreen(
     viewModel: RecoverPasswordViewModel = hiltViewModel(),
     navigator: Navigator,
-    email: String
+    email: String,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val getLoginAccountUseCase: LoginAccountUseCase
+    private val getLoginAccountUseCase: LoginAccountUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -27,13 +27,13 @@ class LoginViewModel @Inject constructor(
 
     fun onEvent(event: LoginEvent) {
         when (event) {
-            is LoginEvent.PasswordChanged -> _state.update { it.copy(loginModel = it.loginModel.copy(password = event.password)) }
-            is LoginEvent.PasswordVisibilityChanged -> _state.update { it.copy(isPasswordVisible = event.isVisible) }
+            is LoginEvent.PasswordChanged -> onPasswordChanges(event.password)
+            is LoginEvent.PasswordVisibilityChanged -> onPasswordVisibilityChanges(event.isVisible)
             is LoginEvent.Login -> login(state.value.loginModel.email, state.value.loginModel.password)
-            is LoginEvent.EmailChanged -> _state.update { it.copy(loginModel = it.loginModel.copy(email = event.email)) }
-            is LoginEvent.NavigateToForgotPassword -> viewModelScope.launch { _eventFlow.emit(LoginEvent.NavigateToForgotPassword) }
-            is LoginEvent.NavigateToSignUp -> viewModelScope.launch { _eventFlow.emit(LoginEvent.NavigateToSignUp) }
-            is LoginEvent.NavigateToAuthenticateWithGoogle -> viewModelScope.launch { _eventFlow.emit(LoginEvent.NavigateToAuthenticateWithGoogle) }
+            is LoginEvent.EmailChanged -> onEmailChanges(event.email)
+            is LoginEvent.NavigateToForgotPassword -> navigateToForgotPassword()
+            is LoginEvent.NavigateToSignUp -> navigateToSignUp()
+            is LoginEvent.NavigateToAuthenticateWithGoogle -> navigateToAuthenticateWithGoogle()
             else -> { /* Ignore */
             }
         }
@@ -61,4 +61,33 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    private fun onPasswordChanges(password: String) {
+        _state.update { it.copy(loginModel = it.loginModel.copy(password = password)) }
+    }
+
+    private fun onPasswordVisibilityChanges(isVisible: Boolean) {
+        _state.update { it.copy(isPasswordVisible = isVisible) }
+    }
+
+    private fun onEmailChanges(email: String) {
+        _state.update { it.copy(loginModel = it.loginModel.copy(email = email)) }
+    }
+
+    private fun navigateToForgotPassword() {
+        viewModelScope.launch {
+            _eventFlow.emit(LoginEvent.NavigateToForgotPassword)
+        }
+    }
+
+    private fun navigateToSignUp() {
+        viewModelScope.launch {
+            _eventFlow.emit(LoginEvent.NavigateToSignUp)
+        }
+    }
+
+    private fun navigateToAuthenticateWithGoogle() {
+        viewModelScope.launch {
+            _eventFlow.emit(LoginEvent.NavigateToAuthenticateWithGoogle)
+        }
+    }
 }

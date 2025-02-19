@@ -15,11 +15,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,43 +39,42 @@ import com.example.ui.theme.FurbookTheme
 @Composable
 fun RecoverPasswordScreen(
     viewModel: RecoverPasswordViewModel = hiltViewModel(),
-    navigator: Navigator,
-    email: String,
+    navigator: Navigator
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.initializeData(email)
-
         viewModel.eventFlow.collect { event ->
             when (event) {
                 RecoverPasswordEvent.NavigateToLogin -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
                 RecoverPasswordEvent.RecoverPasswordSuccess -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
-                is RecoverPasswordEvent.RecoverPasswordError -> state.snackBarHostState.showSnackbar(event.message)
+                is RecoverPasswordEvent.RecoverPasswordError -> snackBarHostState.showSnackbar(event.message)
             }
         }
     }
 
-    RecoverPasswordContent(state = state, onEvent = { event ->
+    RecoverPasswordContent(state = state, snackBarHostState = snackBarHostState, onEvent = { event ->
         viewModel.onEvent(event)
     })
 }
 
 @Composable
-private fun RecoverPasswordContent(state: RecoverPasswordState, onEvent: (RecoverPasswordEvent) -> Unit = {}) {
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(state.snackBarHostState)
-        }
-    ) { innerPadding ->
+private fun RecoverPasswordContent(
+    state: RecoverPasswordState,
+    snackBarHostState: SnackbarHostState,
+    onEvent: (RecoverPasswordEvent) -> Unit = {},
+) {
+    Scaffold(snackbarHost = {
+        SnackbarHost(snackBarHostState)
+    }) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // ✅ Wave background
                 Box(modifier = Modifier.fillMaxWidth()) {
@@ -87,17 +88,11 @@ private fun RecoverPasswordContent(state: RecoverPasswordState, onEvent: (Recove
                     .padding(horizontal = 32.dp)
 
                 // ✅ Email Field
-                EmailOutlinedTextField(
-                    modifier = modifierTextField,
-                    value = state.email,
-                    label = "Email",
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Email,
-                            contentDescription = "Email Icon"
-                        )
-                    },
-                    onChange = { onEvent(RecoverPasswordEvent.EmailChanged(it)) } // ✅ Explicitly wrap in event
+                EmailOutlinedTextField(modifier = modifierTextField, value = state.email, label = "Email", leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Email, contentDescription = "Email Icon"
+                    )
+                }, onChange = { onEvent(RecoverPasswordEvent.EmailChanged(it)) } // ✅ Explicitly wrap in event
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -126,20 +121,17 @@ private fun RecoverPasswordContent(state: RecoverPasswordState, onEvent: (Recove
 }
 
 @Preview(
-    name = "Light Mode",
-    showBackground = true
+    name = "Light Mode", showBackground = true
 )
 @Preview(
-    name = "Dark Mode",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES // Enables dark mode preview
+    name = "Dark Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES // Enables dark mode preview
 )
 @Preview
 @Composable
 private fun RecoverPasswordContentPreview() {
     FurbookTheme {
-        RecoverPasswordContent(
-            state = RecoverPasswordState(),  // Example state
+        RecoverPasswordContent(state = RecoverPasswordState(),
+            snackBarHostState = SnackbarHostState(),
             onEvent = {}  // Empty handler for preview
         )
     }

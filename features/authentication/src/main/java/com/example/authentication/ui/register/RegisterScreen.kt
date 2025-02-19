@@ -17,11 +17,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -46,29 +48,34 @@ fun RegisterScreen(
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when (event) {
                 RegisterEvent.RegisterSuccess -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
-                is RegisterEvent.RegisterError -> state.snackBarHostState.showSnackbar(event.message)
+                is RegisterEvent.RegisterError -> snackBarHostState.showSnackbar(event.message)
                 RegisterEvent.NavigateToLogin -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
             }
         }
     }
 
-    RegisterContent(state = state, onEvent = { event ->
-        viewModel.onEvent(event)
-    })
+    RegisterContent(state = state,
+        snackBarHostState = snackBarHostState,
+        onEvent = { event ->
+            viewModel.onEvent(event)
+        })
 }
 
 @Composable
 fun RegisterContent(
     state: RegisterState,
+    snackBarHostState: SnackbarHostState,
     onEvent: (RegisterEvent) -> Unit = {},
 ) {
     Scaffold(snackbarHost = {
-        SnackbarHost(state.snackBarHostState)
+        SnackbarHost(snackBarHostState)
     }) { innerPadding ->
         Box(
             modifier = Modifier
@@ -175,7 +182,8 @@ fun RegisterContent(
 @Composable
 private fun RegisterScreenPreview() {
     FurbookTheme {
-        RegisterContent(state = RegisterState(),  // Example state
+        RegisterContent(state = RegisterState(),
+            snackBarHostState = SnackbarHostState(),
             onEvent = {}  // Empty handler for preview
         )
     }

@@ -1,19 +1,19 @@
 package com.example.core.di.authentication
 
-import com.example.core.data.authentication.fake_repository.AuthenticationFakeRepositoryImpl
+import com.example.core.data.authentication.repository.AuthenticationRepositoryImpl
 import com.example.core.domain.authentication.repository.AuthenticationRepository
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AuthenticationModule {
+abstract class AuthenticationModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideAuthenticationRepository(): AuthenticationRepository = AuthenticationFakeRepositoryImpl()
+    abstract fun provideAuthenticationRepository(impl: AuthenticationRepositoryImpl): AuthenticationRepository
 }
 

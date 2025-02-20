@@ -17,7 +17,6 @@ fun NavGraphBuilder.authenticationGraph(navigator: Navigator) {
         RegisterScreen(navigator = navigator)
     }
     composable<AuthenticationNavigation.RecoverPassword> {
-        val args = it.toRoute<AuthenticationNavigation.RecoverPassword>()
-        RecoverPasswordScreen(navigator = navigator, email = args.email)
+        RecoverPasswordScreen(navigator = navigator)
     }
 }

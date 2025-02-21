@@ -35,6 +35,7 @@ import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.Navigator
 import com.example.ui.composables.WaveBackground
 import com.example.ui.theme.FurbookTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RecoverPasswordScreen(
@@ -45,7 +46,7 @@ fun RecoverPasswordScreen(
     val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.eventFlow.collect { event ->
+        viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 RecoverPasswordEvent.NavigateToLogin -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
                 RecoverPasswordEvent.RecoverPasswordSuccess -> navigator.navigateWithSafety(AuthenticationNavigation.Login)

@@ -40,6 +40,7 @@ import com.example.navigation.Navigator
 import com.example.ui.R
 import com.example.ui.composables.WaveBackground
 import com.example.ui.theme.FurbookTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RegisterScreen(
@@ -52,7 +53,7 @@ fun RegisterScreen(
 
 
     LaunchedEffect(Unit) {
-        viewModel.eventFlow.collect { event ->
+        viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 RegisterEvent.RegisterSuccess -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
                 is RegisterEvent.RegisterError -> snackBarHostState.showSnackbar(event.message)

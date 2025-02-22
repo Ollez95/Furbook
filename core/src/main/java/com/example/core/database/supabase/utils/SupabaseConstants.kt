@@ -11,7 +11,7 @@ object SupabaseConstants {
     const val UNKNOWN = "unknown"
     const val NO_INTERNET = "no_internet"
     const val VALIDATION_FAILED = "validation_failed"
-
+    const val ERROR_NOT_ADDED_YET = "error_not_added_yet"
 
     /**
      * Responses to the User

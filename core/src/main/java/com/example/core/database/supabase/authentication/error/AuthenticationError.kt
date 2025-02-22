@@ -10,9 +10,7 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 object AuthenticationExceptionHandler {
     fun handleAuthenticationException(exception: Exception): AuthenticationErrorResponse {
         return when (exception) {
-            is AuthRestException -> fromCode(
-                exception.errorCode?.value ?: "",
-                exception.description ?: "")
+            is AuthRestException -> fromCode(exception.errorCode?.value ?: "", exception.description ?: "")
             is HttpRequestTimeoutException,
             is ConnectTimeoutException-> AuthenticationErrorResponse.Timeout
             is HttpRequestException -> AuthenticationErrorResponse.NoInternet

@@ -1,6 +1,7 @@
 package com.example.core.database.supabase.model
 
 import com.example.core.database.supabase.utils.SupabaseConstants.EMAIL_NOT_CONFIRMED
+import com.example.core.database.supabase.utils.SupabaseConstants.ERROR_NOT_ADDED_YET
 import com.example.core.database.supabase.utils.SupabaseConstants.INVALID_CREDENTIALS
 import com.example.core.database.supabase.utils.SupabaseConstants.NO_INTERNET
 import com.example.core.database.supabase.utils.SupabaseConstants.NO_INTERNET_RESPONSE
@@ -17,7 +18,7 @@ sealed class AuthenticationErrorResponse(val code: String, open val message: Str
     data class UserNotFound(val error: String, val description: String) : AuthenticationErrorResponse(error, description)
     data class EmailNotConfirmed(val error: String, val description: String) : AuthenticationErrorResponse(error, description)
     data class ValidationFailed(val error: String, val description: String) : AuthenticationErrorResponse(error, description)
-    data class ErrorNotAddedYet(val description: String) : AuthenticationErrorResponse(UNKNOWN, description)
+    data class ErrorNotAddedYet(val description: String) : AuthenticationErrorResponse(ERROR_NOT_ADDED_YET, description)
 
     data object UnknownError : AuthenticationErrorResponse(UNKNOWN, UNKNOWN_ERROR_RESPONSE)
     data object NoInternet : AuthenticationErrorResponse(NO_INTERNET, NO_INTERNET_RESPONSE)
@@ -30,7 +31,7 @@ sealed class AuthenticationErrorResponse(val code: String, open val message: Str
                 USER_NOT_FOUND -> UserNotFound(error, description)
                 EMAIL_NOT_CONFIRMED -> EmailNotConfirmed(error, description)
                 VALIDATION_FAILED -> ValidationFailed(error, description)
-                else -> ErrorNotAddedYet(description)
+                else -> ErrorNotAddedYet(error)
             }
         }
     }

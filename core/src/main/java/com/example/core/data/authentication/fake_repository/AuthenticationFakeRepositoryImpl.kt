@@ -42,4 +42,16 @@ class AuthenticationFakeRepositoryImpl: AuthenticationRepository {
             emit(Response.Error(ACCOUNT_DO_NOT_EXIST))
         }
     }
+
+    override suspend fun saveUserToken() {
+        TODO("Not yet implemented")
+    }
+
+    override fun isUserLoggedIn(): Flow<Response<Boolean>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun logout(): Flow<Response<Boolean>> {
+        TODO("Not yet implemented")
+    }
 }

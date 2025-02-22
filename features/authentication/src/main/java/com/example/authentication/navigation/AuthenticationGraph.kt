@@ -2,7 +2,6 @@ package com.example.authentication.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.example.authentication.ui.login.LoginScreen
 import com.example.authentication.ui.recover_password.RecoverPasswordScreen
 import com.example.authentication.ui.register.RegisterScreen

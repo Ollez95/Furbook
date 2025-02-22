@@ -47,6 +47,7 @@ dependencies {
     //add ui library
     implementation(project(":features:onboarding"))
     implementation(project(":features:authentication"))
+    implementation(project(":features:home"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -1,9 +1,9 @@
 package com.example.core.data.authentication.repository
 
-import AuthenticationDataStore
 import com.example.core.database.supabase.authentication.error.AuthenticationExceptionHandler.handleAuthenticationException
 import com.example.core.domain.authentication.repository.AuthenticationRepository
 import com.example.core.utils.Response
+import com.example.datastore.authentication.IsUserLoggedInDatastore
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
-    private val authenticationDataStore: AuthenticationDataStore,
+    private val isUserLoggedInDataStore: IsUserLoggedInDatastore,
     private val auth: Auth,
 ) : AuthenticationRepository {
     override fun login(email: String, password: String): Flow<Response<Boolean>> = flow {
@@ -55,7 +55,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override fun isUserLoggedIn(): Flow<Response<Boolean>> = flow {
         try {
-            val token = authenticationDataStore.getValueDatastore().firstOrNull()
+            val token = isUserLoggedInDataStore.getValueDatastore().firstOrNull()
             if(token.isNullOrEmpty()){
                 emit(Response.Error("Token is empty"))
             } else {
@@ -73,7 +73,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
         emit(Response.Loading)
         try {
             auth.signOut()
-            authenticationDataStore.clearValueDatastore()
+            isUserLoggedInDataStore.clearValueDatastore()
             emit(Response.Success(true))
         } catch (e: Exception) {
             emit(Response.Error(handleAuthenticationException(e).message))
@@ -83,6 +83,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
     override suspend fun saveUserToken() {
         val token = auth.currentSessionOrNull()?.accessToken
         if(token.isNullOrEmpty()) throw Exception("Token is empty")
-        authenticationDataStore.saveValueDatastore(token)
+        isUserLoggedInDataStore.saveValueDatastore(token)
     }
 }

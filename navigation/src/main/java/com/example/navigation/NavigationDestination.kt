@@ -14,11 +14,18 @@ sealed class OnBoardingNavigation : NavigationDestination {
 @Serializable
 sealed class AuthenticationNavigation : NavigationDestination {
     @Serializable
-    data object Register : AuthenticationNavigation()
+    data object Register: AuthenticationNavigation()
 
     @Serializable
-    data object Login : AuthenticationNavigation()
+    data object Login: AuthenticationNavigation()
 
     @Serializable
     data class RecoverPassword(val email: String = "") : AuthenticationNavigation()
+}
+
+@Serializable
+sealed class HomeNavigation : NavigationDestination {
+
+    @Serializable
+    data object Main: HomeNavigation()
 }

@@ -45,7 +45,7 @@ android {
 
 dependencies {
     implementation(project(":ui"))
-    implementation(project(":datastore"))
+    api(project(":datastore"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

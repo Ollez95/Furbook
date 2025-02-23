@@ -7,7 +7,9 @@ import com.example.navigation.Navigator
 class FurbookNavigator(private val navController: NavController) : Navigator {
     override fun navigateToDestinationCleaningStack(destination: NavigationDestination) {
         navController.navigate(destination) {
-            popUpTo(navController.currentBackStackEntry?.destination?.route ?: return@navigate) { inclusive = true }
+            popUpTo(navController.graph.startDestinationId) {
+                inclusive = true // ✅ Removes all previous destinations
+            }
             launchSingleTop = true
         }
     }

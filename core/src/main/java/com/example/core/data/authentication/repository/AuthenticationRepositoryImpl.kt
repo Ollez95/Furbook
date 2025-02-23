@@ -1,6 +1,5 @@
 package com.example.core.data.authentication.repository
 
-import android.util.Log
 import com.example.core.database.supabase.authentication.error.AuthenticationExceptionHandler.handleAuthenticationException
 import com.example.core.domain.authentication.repository.AuthenticationRepository
 import com.example.core.utils.Response
@@ -8,10 +7,7 @@ import com.example.datastore.authentication.IsUserLoggedInDatastore
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
@@ -66,7 +62,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
                     auth.retrieveUser(token)
                     auth.refreshCurrentSession()
                     saveUserToken()
-                    Log.d("Executed", "Once") // ✅ Should only log ONCE
                     Response.Success(true)
                 } catch (e: Exception) {
                     Response.Error(handleAuthenticationException(e).message)
@@ -90,7 +85,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun saveUserToken() {
         val token = auth.currentSessionOrNull()?.accessToken
-        if(token.isNullOrEmpty()) throw Exception("Token is empty")
+        if (token.isNullOrEmpty()) throw Exception("Token is empty")
         isUserLoggedInDataStore.saveValueDatastore(token)
     }
 }

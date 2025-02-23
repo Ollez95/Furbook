@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.authentication.ui.composables.EmailOutlinedTextField
 import com.example.authentication.ui.composables.PasswordWithoutIconOutlinedTextField
 import com.example.navigation.AuthenticationNavigation
+import com.example.navigation.HomeNavigation
 import com.example.navigation.Navigator
 import com.example.ui.R
 import com.example.ui.composables.WaveBackground
@@ -54,7 +55,7 @@ fun RegisterScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                RegisterEvent.RegisterSuccess -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
+                RegisterEvent.RegisterSuccess -> navigator.navigateWithSafety(HomeNavigation.Main)
                 is RegisterEvent.RegisterError -> snackBarHostState.showSnackbar(event.message)
                 RegisterEvent.NavigateToLogin -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
             }

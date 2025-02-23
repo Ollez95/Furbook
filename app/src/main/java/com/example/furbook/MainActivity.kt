@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.furbook.navigator.FurbookNavigation
@@ -22,13 +24,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Initialize Splash Screen
         splashScreen.setKeepOnScreenCondition {
-            viewModel.isLoading.value
+            viewModel.state.value.isLoading
         }
         enableEdgeToEdge()
         setContent {
-            val state = viewModel.state.collectAsStateWithLifecycle()
-            FurbookTheme(dynamicColor = false) {
-                FurbookNavigation(state.value)
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
+            // ✅ Prevent navigation from rendering until loading is done
+            if (!state.isLoading) {
+                FurbookTheme(dynamicColor = false) {
+                    FurbookNavigation(state)
+                }
             }
         }
     }

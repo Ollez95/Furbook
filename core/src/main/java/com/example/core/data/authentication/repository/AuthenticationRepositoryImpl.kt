@@ -1,5 +1,6 @@
 package com.example.core.data.authentication.repository
 
+import android.util.Log
 import com.example.core.database.supabase.authentication.error.AuthenticationExceptionHandler.handleAuthenticationException
 import com.example.core.domain.authentication.repository.AuthenticationRepository
 import com.example.core.utils.Response
@@ -7,8 +8,8 @@ import com.example.datastore.authentication.IsUserLoggedInDatastore
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
@@ -53,21 +54,23 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun isUserLoggedIn(): Flow<Response<Boolean>> = flow {
-        try {
-            val token = isUserLoggedInDataStore.getValueDatastore().firstOrNull()
-            if(token.isNullOrEmpty()){
-                emit(Response.Error("Token is empty"))
-            } else {
-                auth.retrieveUser(token)
-                auth.refreshCurrentSession()
-                saveUserToken()
-                emit(Response.Success(true))
+    override fun isUserLoggedIn(): Flow<Response<Boolean>> =
+        isUserLoggedInDataStore.getValueDatastore()
+            .map { token ->
+                if (token.isNullOrEmpty()) {
+                    Response.Error("Token is empty")
+                } else {
+                    try {
+                        auth.retrieveUser(token)
+                        auth.refreshCurrentSession()
+                        saveUserToken()
+                        Log.d("Executed", "Once")
+                        Response.Success(true)
+                    } catch (e: Exception) {
+                        Response.Error(handleAuthenticationException(e).message)
+                    }
+                }
             }
-        } catch (e: Exception) {
-            emit(Response.Error(handleAuthenticationException(e).message))
-        }
-    }
 
     override fun logout(): Flow<Response<Boolean>> = flow {
         emit(Response.Loading)

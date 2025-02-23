@@ -2,49 +2,34 @@ package com.example.furbook.navigator
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.datastore.authentication.IsUserLoggedInDatastore
-import com.example.datastore.onboarding.WasOnBoardingExecutedDatastore
+import com.example.core.navigation.NavigationHelperRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class FurbookViewModel @Inject constructor(
-    private val wasOnBoardingExecutedDatastore: WasOnBoardingExecutedDatastore,
-    private val isUserLoggedInDatastore: IsUserLoggedInDatastore
-): ViewModel() {
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    navigationHelperRepository: NavigationHelperRepository,
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(FurbookState())
-    val state: StateFlow<FurbookState> = _state.asStateFlow()
+    // ✅ Use stateIn to prevent re-executions
+    val state: StateFlow<FurbookState> =
+        navigationHelperRepository
+        .checkNavigationState()
+        .map { (isCompleted, isUserLoggedIn) ->
+            FurbookState(
+                isOnboardingCompleted = isCompleted,
+                isUserAuthenticated = isUserLoggedIn,
+                isLoading = false
+            )
+        }.stateIn(
+                scope = viewModelScope,
+                // 👇 Fix: Use WhileSubscribed to limit re-executions
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = FurbookState(isLoading = true)
+            )
 
-    init {
-        checkStatus()
-    }
-
-    private fun checkStatus() {
-        viewModelScope.launch {
-            // Combine both flows
-            combine(
-                wasOnBoardingExecutedDatastore.getValueDatastore(),
-                isUserLoggedInDatastore.getValueDatastore()
-            ) { isOnboardingDone, userToken ->
-                Pair(isOnboardingDone, userToken)
-            }.collect { (isCompleted, userToken) ->
-                _state.update {
-                    it.copy(
-                        isOnboardingCompleted = isCompleted ?: false,
-                        isUserAuthenticated = !userToken.isNullOrEmpty() // Or use Boolean
-                    )
-                }
-                _isLoading.value = false
-            }
-        }
-    }
 }

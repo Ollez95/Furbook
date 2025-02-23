@@ -1,7 +1,6 @@
 package com.example.authentication.ui.login
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +42,7 @@ import com.example.authentication.ui.composables.PasswordOutlinedTextField
 import com.example.authentication.ui.composables.RegisterText
 import com.example.core.domain.authentication.login.models.LoginModel
 import com.example.navigation.AuthenticationNavigation
+import com.example.navigation.HomeNavigation
 import com.example.navigation.Navigator
 import com.example.ui.composables.Logo
 import com.example.ui.composables.WaveBackground
@@ -60,7 +60,7 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                LoginEvent.LoginSuccess -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
+                LoginEvent.LoginSuccess -> navigator.navigateWithSafety(HomeNavigation.Main)
                 is LoginEvent.LoginError -> snackBarHostState.showSnackbar(event.message)
                 LoginEvent.NavigateToSignUp -> navigator.navigateWithSafety(AuthenticationNavigation.Register)
                 LoginEvent.NavigateToForgotPassword -> navigator.navigateWithSafety(AuthenticationNavigation.RecoverPassword(state.loginModel.email))

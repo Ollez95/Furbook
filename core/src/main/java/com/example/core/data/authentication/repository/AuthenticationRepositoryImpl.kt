@@ -8,8 +8,10 @@ import com.example.datastore.authentication.IsUserLoggedInDatastore
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
@@ -54,23 +56,26 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun isUserLoggedIn(): Flow<Response<Boolean>> =
-        isUserLoggedInDataStore.getValueDatastore()
-            .map { token ->
-                if (token.isNullOrEmpty()) {
-                    Response.Error("Token is empty")
-                } else {
-                    try {
-                        auth.retrieveUser(token)
-                        auth.refreshCurrentSession()
-                        saveUserToken()
-                        Log.d("Executed", "Once")
-                        Response.Success(true)
-                    } catch (e: Exception) {
-                        Response.Error(handleAuthenticationException(e).message)
-                    }
+    override suspend fun isUserLoggedIn(): Response<Boolean> {
+        return try {
+            val token = isUserLoggedInDataStore.getValueDataStoreOnce() // ✅ Uses the suspend function
+            if (token.isNullOrEmpty()) {
+                Response.Error("Token is empty")
+            } else {
+                try {
+                    auth.retrieveUser(token)
+                    auth.refreshCurrentSession()
+                    saveUserToken()
+                    Log.d("Executed", "Once") // ✅ Should only log ONCE
+                    Response.Success(true)
+                } catch (e: Exception) {
+                    Response.Error(handleAuthenticationException(e).message)
                 }
             }
+        } catch (e: Exception) {
+            Response.Error("Failed to fetch login status: ${e.message}")
+        }
+    }
 
     override fun logout(): Flow<Response<Boolean>> = flow {
         emit(Response.Loading)

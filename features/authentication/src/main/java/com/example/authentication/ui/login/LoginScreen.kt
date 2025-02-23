@@ -60,7 +60,7 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                LoginEvent.LoginSuccess -> navigator.navigateWithSafety(HomeNavigation.Main)
+                LoginEvent.LoginSuccess -> navigator.navigateToDestinationCleaningStack(HomeNavigation.Main)
                 is LoginEvent.LoginError -> snackBarHostState.showSnackbar(event.message)
                 LoginEvent.NavigateToSignUp -> navigator.navigateWithSafety(AuthenticationNavigation.Register)
                 LoginEvent.NavigateToForgotPassword -> navigator.navigateWithSafety(AuthenticationNavigation.RecoverPassword(state.loginModel.email))

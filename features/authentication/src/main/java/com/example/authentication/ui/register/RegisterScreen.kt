@@ -55,7 +55,7 @@ fun RegisterScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                RegisterEvent.RegisterSuccess -> navigator.navigateWithSafety(HomeNavigation.Main)
+                RegisterEvent.RegisterSuccess -> navigator.navigateToDestinationCleaningStack(HomeNavigation.Main)
                 is RegisterEvent.RegisterError -> snackBarHostState.showSnackbar(event.message)
                 RegisterEvent.NavigateToLogin -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
             }

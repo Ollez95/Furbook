@@ -47,7 +47,7 @@ class AuthenticationFakeRepositoryImpl: AuthenticationRepository {
         TODO("Not yet implemented")
     }
 
-    override fun isUserLoggedIn(): Flow<Response<Boolean>> {
+    override suspend fun isUserLoggedIn(): Response<Boolean> {
         TODO("Not yet implemented")
     }
 

@@ -24,13 +24,12 @@ class FurbookViewModel @Inject constructor(
 
     private fun checkStatus() {
         viewModelScope.launch {
-            val (isCompleted, isUserLoggedIn) = navigationHelperRepository.checkNavigationStateOnce()
+            val (isCompleted, isUserAuthenticated) = navigationHelperRepository.checkNavigationStateOnce()
             _state.value = FurbookState(
                 isOnboardingCompleted = isCompleted,
-                isUserAuthenticated = isUserLoggedIn,
+                isUserAuthenticated = isUserAuthenticated,
                 isLoading = false
             )
         }
     }
-
 }

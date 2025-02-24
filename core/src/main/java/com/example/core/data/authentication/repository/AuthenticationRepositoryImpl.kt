@@ -2,6 +2,8 @@ package com.example.core.data.authentication.repository
 
 import com.example.core.database.supabase.authentication.error.AuthenticationExceptionHandler.handleAuthenticationException
 import com.example.core.domain.authentication.repository.AuthenticationRepository
+import com.example.core.domain.authentication.repository.UserRepository
+import com.example.core.domain.shared.model.User
 import com.example.core.utils.Response
 import com.example.core.utils.authentication.AuthenticationUtils.validateLoginCredentials
 import com.example.core.utils.authentication.AuthenticationUtils.validateRecoveryCredentials
@@ -16,6 +18,7 @@ import javax.inject.Inject
 class AuthenticationRepositoryImpl @Inject constructor(
     private val isUserLoggedInDataStore: IsUserLoggedInDatastore,
     private val auth: Auth,
+    private val userRepository: UserRepository
 ) : AuthenticationRepository {
 
     override fun login(email: String, password: String): Flow<Response<Boolean>> = flow {
@@ -40,6 +43,14 @@ class AuthenticationRepositoryImpl @Inject constructor(
             auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
+            }
+            val userId = auth.currentSessionOrNull()?.user?.id ?: ""
+
+            userRepository.createUser(User(userId ,username,email))
+                .collect { result ->
+                if (result is Response.Error) {
+                    throw Exception("User creation failed: ${result.message}")
+                }
             }
             saveUserToken()
             emit(Response.Success(true))
@@ -69,6 +80,14 @@ class AuthenticationRepositoryImpl @Inject constructor(
                     auth.retrieveUser(token)
                     auth.refreshCurrentSession()
                     saveUserToken()
+                    val userId = auth.currentSessionOrNull()?.user?.id ?: ""
+
+                    userRepository.createUser(User(userId ,"username","email"))
+                        .collect { result ->
+                            if (result is Response.Error) {
+                                throw Exception("User creation failed: ${result.message}")
+                            }
+                        }
                     Response.Success(true)
                 } catch (e: Exception) {
                     Response.Error(handleAuthenticationException(e).message)

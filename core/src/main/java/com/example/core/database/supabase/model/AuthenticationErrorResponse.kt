@@ -3,6 +3,9 @@ package com.example.core.database.supabase.model
 import com.example.core.database.supabase.utils.SupabaseConstants.EMAIL_NOT_CONFIRMED
 import com.example.core.database.supabase.utils.SupabaseConstants.ERROR_NOT_ADDED_YET
 import com.example.core.database.supabase.utils.SupabaseConstants.INVALID_CREDENTIALS
+import com.example.core.database.supabase.utils.SupabaseConstants.INVALID_CREDENTIALS_RESPONSE
+import com.example.core.database.supabase.utils.SupabaseConstants.INVALID_EMAIL_RESPONSE
+import com.example.core.database.supabase.utils.SupabaseConstants.INVALID_REGISTER_RESPONSE
 import com.example.core.database.supabase.utils.SupabaseConstants.NO_INTERNET
 import com.example.core.database.supabase.utils.SupabaseConstants.NO_INTERNET_RESPONSE
 import com.example.core.database.supabase.utils.SupabaseConstants.TIMEOUT
@@ -20,6 +23,9 @@ sealed class AuthenticationErrorResponse(val code: String, open val message: Str
     data class ValidationFailed(val error: String, val description: String) : AuthenticationErrorResponse(error, description)
     data class ErrorNotAddedYet(val description: String) : AuthenticationErrorResponse(ERROR_NOT_ADDED_YET, description)
 
+    data object InvalidEmailOrPassword : AuthenticationErrorResponse(INVALID_CREDENTIALS, INVALID_CREDENTIALS_RESPONSE)
+    data object InvalidEmail : AuthenticationErrorResponse(INVALID_CREDENTIALS, INVALID_EMAIL_RESPONSE)
+    data object InvalidUsernameEmailOrPassword : AuthenticationErrorResponse(INVALID_CREDENTIALS, INVALID_REGISTER_RESPONSE)
     data object UnknownError : AuthenticationErrorResponse(UNKNOWN, UNKNOWN_ERROR_RESPONSE)
     data object NoInternet : AuthenticationErrorResponse(NO_INTERNET, NO_INTERNET_RESPONSE)
     data object Timeout : AuthenticationErrorResponse(TIMEOUT, TIMEOUT_ERROR_RESPONSE)

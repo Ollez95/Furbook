@@ -3,6 +3,9 @@ package com.example.core.data.authentication.repository
 import com.example.core.database.supabase.authentication.error.AuthenticationExceptionHandler.handleAuthenticationException
 import com.example.core.domain.authentication.repository.AuthenticationRepository
 import com.example.core.utils.Response
+import com.example.core.utils.authentication.AuthenticationUtils.validateLoginCredentials
+import com.example.core.utils.authentication.AuthenticationUtils.validateRecoveryCredentials
+import com.example.core.utils.authentication.AuthenticationUtils.validateRegisterCredentials
 import com.example.datastore.authentication.IsUserLoggedInDatastore
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -14,9 +17,11 @@ class AuthenticationRepositoryImpl @Inject constructor(
     private val isUserLoggedInDataStore: IsUserLoggedInDatastore,
     private val auth: Auth,
 ) : AuthenticationRepository {
+
     override fun login(email: String, password: String): Flow<Response<Boolean>> = flow {
         emit(Response.Loading)
         try {
+            validateLoginCredentials(email, password)
             auth.signInWith(Email) {
                 this.email = email
                 this.password = password
@@ -31,6 +36,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
     override fun register(username: String, email: String, password: String, passwordConfirmation: String): Flow<Response<Boolean>> = flow {
         emit(Response.Loading)
         try {
+            validateRegisterCredentials(username, email, password, passwordConfirmation)
             auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
@@ -45,6 +51,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
     override fun recoverPassword(email: String): Flow<Response<Boolean>> = flow {
         emit(Response.Loading)
         try {
+            validateRecoveryCredentials(email)
             auth.resetPasswordForEmail(email)
             emit(Response.Success(true))
         } catch (e: Exception) {

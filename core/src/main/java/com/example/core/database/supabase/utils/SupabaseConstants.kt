@@ -17,6 +17,8 @@ object SupabaseConstants {
      * Responses to the User
      */
     const val INVALID_CREDENTIALS_RESPONSE = "Invalid email or password."
+    const val INVALID_EMAIL_RESPONSE = "Invalid email"
+    const val INVALID_REGISTER_RESPONSE = "Invalid email, username or password"
     const val USER_NOT_FOUND_RESPONSE = "User does not exist."
     const val EMAIL_NOT_CONFIRMED_RESPONSE = "Please confirm your email before logging in."
     const val UNKNOWN_ERROR_RESPONSE = "An unknown error occurred"

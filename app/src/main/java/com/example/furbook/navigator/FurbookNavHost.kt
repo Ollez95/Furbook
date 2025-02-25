@@ -21,7 +21,7 @@ fun FurbookNavigation(state: FurbookState) {
     NavHost(navController = navController, startDestination = startDestination(state)) {
         onBoardingGraph(navigator = navigator)
         authenticationGraph(navigator = navigator)
-        homeGraph()
+        homeGraph(navigator)
     }
 }
 

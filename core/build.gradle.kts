@@ -69,10 +69,13 @@ dependencies {
     kapt(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // Supa Base
+    // SupaBase
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgrest.kt)
     implementation(libs.supabase.auth.kt)
     implementation(libs.supabase.ktor.client.engine)
     implementation(libs.supabase.ktor.client.cio)
+
+    // Timber
+    implementation(libs.timber)
 }

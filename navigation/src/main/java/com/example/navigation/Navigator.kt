@@ -5,4 +5,5 @@ interface Navigator {
     fun navigateBack()
     fun navigateToDestination(destination: NavigationDestination)
     fun navigateWithSafety(destination: NavigationDestination)
+    fun navigateBackUntil(navigateTo: NavigationDestination)
 }

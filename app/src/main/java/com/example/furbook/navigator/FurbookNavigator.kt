@@ -40,6 +40,15 @@ class FurbookNavigator(private val navController: NavController) : Navigator {
         }
     }
 
+    override fun navigateBackUntil(navigateTo: NavigationDestination) {
+        navController.navigate(navigateTo) {
+            popUpTo(0) {
+                inclusive = true // ✅ Removes all previous destinations
+            }
+            launchSingleTop = true
+        }
+    }
+
     companion object {
         private var LAST_NAVIGATION_TIME = 0L
         private const val THROTTLE_INTERVAL = 500L // Throttle time in milliseconds

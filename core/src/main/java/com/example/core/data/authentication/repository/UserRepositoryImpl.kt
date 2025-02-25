@@ -6,6 +6,7 @@ import com.example.core.utils.Response
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -20,17 +21,18 @@ class UserRepositoryImpl @Inject constructor(
                 .decodeSingle<User>()
             emit(Response.Success(result))
         } catch (e: Exception) {
+            Timber.e(e.message)
             emit(Response.Error(e.message ?: ERROR_MESSAGE))
         }
     }
 
-    override fun createUser(user: User): Flow<Response<Boolean>> = flow {
-        emit(Response.Loading)
-        try {
+    override suspend fun createUser(user: User): Response<Boolean> {
+        return try {
             postgrest[USERS_DATABASE].insert(user) // ✅ Ensure `id` & `created_at` are not sent
-            emit(Response.Success(true))
+            Response.Success(true)
         } catch (e: Exception) {
-            emit(Response.Error(e.message ?: ERROR_MESSAGE))
+            Timber.e(e.message)
+            Response.Error(e.message ?: ERROR_MESSAGE)
         }
     }
 
@@ -44,6 +46,7 @@ class UserRepositoryImpl @Inject constructor(
 
             emit(Response.Success(true))
         } catch (e: Exception) {
+            Timber.e(e.message)
             emit(Response.Error(e.message ?: ERROR_MESSAGE))
         }
     }

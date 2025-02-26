@@ -79,8 +79,7 @@ dependencies {
     implementation(libs.timber)
 
     // Room
-    implementation(libs.androidx.room.runtime) // ✅ Core Room library
-    //ksp(libs.androidx.room.compiler) // ✅ Annotation Processor (for DAO)
-    // Kotlin Coroutines support for Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 }

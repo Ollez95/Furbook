@@ -18,7 +18,10 @@ object DatabaseModule {
     @Singleton
     fun providesFurbookDatabase(
         @ApplicationContext context: Context,
-    ): FurbookDatabase = Room.databaseBuilder(
-        context, FurbookDatabase::class.java,
-        "furbook-database").build()
+    ): FurbookDatabase {
+        return Room.databaseBuilder(
+            context, FurbookDatabase::class.java,
+            "furbook-database"
+        ).build()
+    }
 }

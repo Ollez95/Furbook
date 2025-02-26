@@ -8,7 +8,9 @@ import com.example.core.domain.shared.model.toEntity
 import com.example.core.utils.Response
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class UserRepositoryLocal @Inject constructor(
     private val userDao: UserDao,
 ) : UserRepository {

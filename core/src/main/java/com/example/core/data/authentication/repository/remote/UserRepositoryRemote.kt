@@ -6,7 +6,9 @@ import com.example.core.utils.Response
 import io.github.jan.supabase.postgrest.Postgrest
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class UserRepositoryRemote @Inject constructor(
     private val postgrest: Postgrest,
 ) : UserRepository {

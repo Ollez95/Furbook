@@ -11,8 +11,7 @@ import javax.inject.Singleton
 @Singleton
 class UserRepositoryImpl @Inject constructor(
     private val localRepository: UserRepositoryLocal,
-    private val remoteRepository: UserRepositoryRemote
-): UserRepository {
+    private val remoteRepository: UserRepositoryRemote): UserRepository {
     override suspend fun getUserById(id: String): Response<User> {
         val localUser = localRepository.getUserById(id)
         if (localUser is Response.Success) {
@@ -28,12 +27,12 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun createUser(user: User): Response<Boolean> {
         val remoteUser = remoteRepository.createUser(user)
         if (remoteUser is Response.Error) {
-            return Response.Error("Failed to create user in remote: ${remoteUser.message}")
+            return Response.Error(CREATE_USER_LOCAL_ERROR + remoteUser.message)
         }
 
         val localUser = localRepository.createUser(user)
         if (localUser is Response.Error) {
-            return Response.Error("Failed to save user locally: ${localUser.message}")
+            return Response.Error(CREATE_USER_REMOTE_ERROR + localUser.message)
         }
 
         return Response.Success(true) // ✅ Both operations were successful
@@ -52,7 +51,8 @@ class UserRepositoryImpl @Inject constructor(
 
     companion object {
         private const val GET_USER_ERROR = "GET User error"
-        private const val POST_USER_ERROR = "POST User error"
         private const val PUT_USER_ERROR = "PUT User error"
+        private const val CREATE_USER_LOCAL_ERROR = "Failed to save user locally: "
+        private const val CREATE_USER_REMOTE_ERROR = "Failed to save user remotely: "
     }
 }

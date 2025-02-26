@@ -29,6 +29,6 @@ private fun startDestination(state: FurbookState): NavigationDestination {
     return when {
         !state.isOnboardingCompleted -> OnBoardingNavigation.Onboarding
         !state.isUserAuthenticated -> AuthenticationNavigation.Login
-        else -> HomeNavigation.Main
+        else -> HomeNavigation.Main(state.userId)
     }
 }

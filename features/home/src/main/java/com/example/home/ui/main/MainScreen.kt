@@ -78,7 +78,7 @@ fun MainContent(state: MainState = MainState(), onEvent: (MainEvent) -> Unit = {
 
     // Simulated User Data (Replace with actual user data)
     val userName = user.username
-    val userEmail = user.email
+    val userEmail = user.mail
     val userProfilePic = painterResource(id = com.example.ui.R.drawable.on_boarding_image_1) // Replace with actual image
 
     ModalNavigationDrawer(

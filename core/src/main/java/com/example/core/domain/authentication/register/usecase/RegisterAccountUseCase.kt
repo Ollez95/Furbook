@@ -8,7 +8,7 @@ import javax.inject.Inject
 class RegisterAccountUseCase @Inject constructor(
     private val repository: AuthenticationRepository,
 ) {
-    operator fun invoke(username: String, email: String, password: String, passwordConfirmation: String): Flow<Response<Boolean>> {
+    operator fun invoke(username: String, email: String, password: String, passwordConfirmation: String): Flow<Response<String>> {
         return repository.register(
             username = username,
             email = email,

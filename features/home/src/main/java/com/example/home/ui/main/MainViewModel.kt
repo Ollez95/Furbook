@@ -1,26 +1,41 @@
 package com.example.home.ui.main
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.authentication.login.usecase.LogoutAccountUseCase
+import com.example.core.domain.authentication.repository.UserRepository
 import com.example.core.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val logoutAccountUseCase: LogoutAccountUseCase
-): ViewModel()
-{
+    private val logoutAccountUseCase: LogoutAccountUseCase,
+    private val userRepository: UserRepository,
+    savedStateHandle: SavedStateHandle,
+) : ViewModel() {
+    private val userId = "userId"
+    private val id = savedStateHandle[userId] ?: ""
+
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = _state
+        .onStart { loadData() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = MainState()
+        )
 
     private val _eventFlow = MutableSharedFlow<MainEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -33,6 +48,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    private fun loadData() {
+        viewModelScope.launch {
+            val user = userRepository.getUserById(id)
+            if (user is Response.Success) {
+                _state.update { it.copy(user = user.data) }
+            }
+        }
+    }
+
     private fun logout() {
         viewModelScope.launch {
             logoutAccountUseCase.invoke().collectLatest { response ->
@@ -40,6 +64,7 @@ class MainViewModel @Inject constructor(
                     is Response.Loading -> {
                         _state.update { it.copy(isLoading = true) }
                     }
+
                     is Response.Success -> {
                         _state.update { it.copy(isLoading = false) }
                         _eventFlow.emit(MainEvent.LogoutSuccess)  // Correct success event

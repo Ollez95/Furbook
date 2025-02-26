@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class User(
     val id: String? = null,
-    val email: String = "",
+    val mail: String = "",
     val username: String = "",
 )
 
 fun User.toEntity(): UserEntity {
-    return UserEntity(id = this.id ?: "", username = this.username, email = this.email)
+    return UserEntity(id = this.id ?: "", username = this.username, mail = this.mail)
 }
 

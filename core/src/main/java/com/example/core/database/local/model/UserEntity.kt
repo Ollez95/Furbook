@@ -7,10 +7,10 @@ import com.example.core.domain.shared.model.User
 @Entity(tableName = "users")
 data class UserEntity(
     @PrimaryKey val id: String,
-    val email: String,
+    val mail: String,
     val username: String
 )
 
 fun UserEntity.toDomainModel(): User {
-    return User(id = this.id, username = this.username, email = this.email)
+    return User(id = this.id, username = this.username, mail = this.mail)
 }

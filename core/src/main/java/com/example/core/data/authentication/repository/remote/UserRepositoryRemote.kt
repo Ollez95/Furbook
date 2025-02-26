@@ -56,8 +56,8 @@ class UserRepositoryRemote @Inject constructor(
         private const val ERROR_MESSAGE = "An error occurred"
         private const val USERS_DATABASE = "users"
 
-        private const val GET_USER_ID_SUCCESS = "Successfully retrieved user with id: "
-        private const val CREATE_USER_ID_SUCCESS = "Successfully created user with id: "
-        private const val UPDATE_USER_ID_SUCCESS = "Successfully updated user with id: "
+        private const val GET_USER_ID_SUCCESS = "Successfully retrieved user in remote database with id: "
+        private const val CREATE_USER_ID_SUCCESS = "Successfully created user in remote database with id: "
+        private const val UPDATE_USER_ID_SUCCESS = "Successfully updated user in remote database with id: "
     }
 }

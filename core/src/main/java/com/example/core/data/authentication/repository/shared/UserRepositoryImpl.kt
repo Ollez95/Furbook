@@ -27,13 +27,16 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun createUser(user: User): Response<Boolean> {
         val remoteUser = remoteRepository.createUser(user)
-        val localUser = localRepository.createUser(user)
-
-        if (remoteUser is Response.Success && localUser is Response.Success) {
-            return Response.Success(true)
+        if (remoteUser is Response.Error) {
+            return Response.Error("Failed to create user in remote: ${remoteUser.message}")
         }
 
-        return Response.Error(POST_USER_ERROR)
+        val localUser = localRepository.createUser(user)
+        if (localUser is Response.Error) {
+            return Response.Error("Failed to save user locally: ${localUser.message}")
+        }
+
+        return Response.Success(true) // ✅ Both operations were successful
     }
 
     override suspend fun updateUser(user: User): Response<Boolean> {

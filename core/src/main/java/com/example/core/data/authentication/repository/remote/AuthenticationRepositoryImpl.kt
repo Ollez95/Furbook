@@ -22,7 +22,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
     private val userRepository: UserRepository,
 ) : AuthenticationRepository {
 
-    override fun login(email: String, password: String): Flow<Response<Boolean>> = flow {
+    override fun login(email: String, password: String): Flow<Response<String>> = flow {
         Timber.Forest.d(START_LOGIN_PROCESS)
         emit(Response.Loading)
         try {
@@ -31,9 +31,12 @@ class AuthenticationRepositoryImpl @Inject constructor(
                 this.email = email
                 this.password = password
             }
+
             saveUserToken()
+            val currentId = getCurrentUserId()
+
             Timber.d(USER_WAS_LOGIN)
-            emit(Response.Success(true))
+            emit(Response.Success(currentId))
         } catch (e: Exception) {
             Timber.e(ERROR_DURING_LOGIN + e.message)
             emit(Response.Error(handleAuthenticationException(e).message))
@@ -45,11 +48,11 @@ class AuthenticationRepositoryImpl @Inject constructor(
         email: String,
         password: String,
         passwordConfirmation: String,
-    ): Flow<Response<Boolean>> = flow {
+    ): Flow<Response<String>> = flow {
         Timber.d(START_REGISTRATION_PROCESS)
         emit(Response.Loading)
         suspend fun processRegisterUser(userId: String) {
-            val registerResponse = userRepository.createUser(User(id = userId, email = email, username = username))
+            val registerResponse = userRepository.createUser(User(id = userId, mail = email, username = username))
             if (registerResponse is Response.Error) {
                 throw Exception(registerResponse.message)
             }
@@ -64,9 +67,12 @@ class AuthenticationRepositoryImpl @Inject constructor(
             }
             val userId = auth.currentSessionOrNull()?.user?.id ?: throw Exception(USER_ID_NOT_FOUND)
             processRegisterUser(userId)
+
             saveUserToken()
+            val currentId = getCurrentUserId()
+
             Timber.d(REGISTRATION_WAS_SUCCESSFUL)
-            emit(Response.Success(true))
+            emit(Response.Success(currentId))
         } catch (e: Exception) {
             Timber.e(ERROR_DURING_REGISTRATION + e.message)
             emit(Response.Error(handleAuthenticationException(e).message))
@@ -88,7 +94,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun isUserLoggedIn(): Response<Boolean> {
+    override suspend fun isUserLoggedIn(): Response<String> {
         return try {
             val token = isUserLoggedInDataStore.getValueDataStoreOnce() // ✅ Uses the suspend function
             if (token.isNullOrEmpty()) {
@@ -99,8 +105,10 @@ class AuthenticationRepositoryImpl @Inject constructor(
                     auth.retrieveUser(token)
                     auth.refreshCurrentSession()
                     saveUserToken()
+                    val currentId = getCurrentUserId()
+
                     Timber.d(USER_IS_LOGGED_IN)
-                    Response.Success(true)
+                    Response.Success(currentId)
                 } catch (e: Exception) {
                     Timber.e(e.message ?: "")
                     Response.Error(handleAuthenticationException(e).message)
@@ -131,6 +139,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
         isUserLoggedInDataStore.saveValueDatastore(token)
         Timber.d(TOKEN_WAS_SUCCESSFULLY_SAVED)
     }
+
+    private fun getCurrentUserId() = auth.currentSessionOrNull()?.user?.id ?: throw Exception(USER_ID_NOT_FOUND)
 
     companion object {
         private const val START_REGISTRATION_PROCESS = "Starting registration process"

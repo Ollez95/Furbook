@@ -50,7 +50,6 @@ class UserRepositoryLocal @Inject constructor(
 
     companion object {
         private const val ERROR_MESSAGE = "An error occurred"
-
         private const val GET_USER_ID_SUCCESS = "Successfully retrieved user in local database with id: "
         private const val CREATE_USER_ID_SUCCESS = "Successfully created user in local database with id: "
         private const val UPDATE_USER_ID_SUCCESS = "Successfully updated user in local database with id: "

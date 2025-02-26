@@ -2,9 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
-    id("kotlin-parcelize")
-    id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.secret.plugin)
 }
@@ -65,8 +64,8 @@ dependencies {
 
     // Dagger Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    kapt(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // SupaBase
@@ -78,4 +77,10 @@ dependencies {
 
     // Timber
     implementation(libs.timber)
+
+    // Room
+    implementation(libs.androidx.room.runtime) // ✅ Core Room library
+    //ksp(libs.androidx.room.compiler) // ✅ Annotation Processor (for DAO)
+    // Kotlin Coroutines support for Room
+    implementation(libs.androidx.room.ktx)
 }

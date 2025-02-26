@@ -1,4 +1,4 @@
-package com.example.core.data.authentication.repository
+package com.example.core.data.authentication.repository.remote
 
 import com.example.core.database.supabase.authentication.error.AuthenticationExceptionHandler.handleAuthenticationException
 import com.example.core.domain.authentication.repository.AuthenticationRepository
@@ -49,7 +49,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
         Timber.d(START_REGISTRATION_PROCESS)
         emit(Response.Loading)
         suspend fun processRegisterUser(userId: String) {
-            val registerResponse = userRepository.createUser(User(id = userId, username = username, mail = email))
+            val registerResponse = userRepository.createUser(User(id = userId, email = email, username = username))
             if (registerResponse is Response.Error) {
                 throw Exception(registerResponse.message)
             }

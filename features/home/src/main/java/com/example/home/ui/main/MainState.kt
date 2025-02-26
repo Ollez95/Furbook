@@ -1,8 +1,8 @@
 package com.example.home.ui.main
 
-import com.example.core.domain.home.main.model.UserInformation
+import com.example.core.domain.shared.model.User
 
 data class MainState(
     val isLoading: Boolean = false,
-    val userInformation: UserInformation = UserInformation(),
+    val user: User = User(),
 )

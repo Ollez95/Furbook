@@ -74,11 +74,11 @@ fun MainContent(state: MainState = MainState(), onEvent: (MainEvent) -> Unit = {
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
-    val userInformation = state.userInformation
+    val user = state.user
 
     // Simulated User Data (Replace with actual user data)
-    val userName = userInformation.username
-    val userEmail = userInformation.email
+    val userName = user.username
+    val userEmail = user.email
     val userProfilePic = painterResource(id = com.example.ui.R.drawable.on_boarding_image_1) // Replace with actual image
 
     ModalNavigationDrawer(

@@ -34,8 +34,6 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.NavigateToForgotPassword -> navigateToForgotPassword()
             is LoginEvent.NavigateToSignUp -> navigateToSignUp()
             is LoginEvent.NavigateToAuthenticateWithGoogle -> navigateToAuthenticateWithGoogle()
-            else -> { /* Ignore */
-            }
         }
     }
 

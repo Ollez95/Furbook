@@ -4,15 +4,18 @@ import com.example.core.domain.authentication.login.usecase.IsUserLoggedInUseCas
 import com.example.core.navigation.model.NavigationResponse
 import com.example.core.utils.Response
 import com.example.datastore.onboarding.WasOnBoardingExecutedDatastore
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.flow.first
+import timber.log.Timber
 import javax.inject.Inject
 
 class NavigationHelperRepository @Inject constructor(
     private val wasOnBoardingExecutedDatastore: WasOnBoardingExecutedDatastore,
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
-) {
-    // ✅ Use suspend function instead of Flow
+    private val auth: Auth) {
+
     suspend fun checkNavigationStateOnce(): NavigationResponse {
-        var token = ""
         var isLoggedIn = false
 
         val wasOnboardingExecuted = try {
@@ -22,10 +25,10 @@ class NavigationHelperRepository @Inject constructor(
         }
 
         if(wasOnboardingExecuted){
+            awaitSessionInitialization()
             isLoggedIn = try {
-                when (val loginResponse = isUserLoggedInUseCase.invoke()) {
+                when (isUserLoggedInUseCase.invoke()) {
                     is Response.Success -> {
-                        token = loginResponse.data
                         true
                     }
                     else -> false
@@ -35,6 +38,13 @@ class NavigationHelperRepository @Inject constructor(
             }
         }
 
-        return NavigationResponse(wasOnboardingExecuted, isLoggedIn, token)
+        return NavigationResponse(wasOnboardingExecuted, isLoggedIn)
+    }
+
+    private suspend fun awaitSessionInitialization() {
+        auth.sessionStatus.first { status ->
+            Timber.d(status.toString())
+            status !is SessionStatus.Initializing
+        }
     }
 }

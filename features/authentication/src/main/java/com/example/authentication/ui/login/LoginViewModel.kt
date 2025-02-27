@@ -47,7 +47,7 @@ class LoginViewModel @Inject constructor(
 
                     is Response.Success -> {
                         _state.update { it.copy(isLoading = false) }
-                        _eventFlow.emit(LoginEvent.LoginSuccess(response.data))  // Correct success event
+                        _eventFlow.emit(LoginEvent.LoginSuccess)  // Correct success event
                     }
 
                     is Response.Error -> {

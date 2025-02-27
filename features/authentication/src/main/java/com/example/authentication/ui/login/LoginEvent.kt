@@ -8,6 +8,6 @@ interface LoginEvent {
     data object NavigateToSignUp : LoginEvent
     data object NavigateToAuthenticateWithGoogle : LoginEvent
     data object Login : LoginEvent
-    data class LoginSuccess(val id: String) : LoginEvent
+    data object LoginSuccess : LoginEvent
     data class LoginError(val message: String) : LoginEvent
 }

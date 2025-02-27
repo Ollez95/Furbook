@@ -8,11 +8,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class IsUserLoggedInDatastore @Inject constructor(dataStore: DataStore<Preferences>) : DatastoreAbstraction<String>(
+class AccessTokenDatastore @Inject constructor(dataStore: DataStore<Preferences>) : DatastoreAbstraction<String>(
     dataStore = dataStore,
     key = AUTHENTICATION_TOKEN
 ) {
     companion object {
-        val AUTHENTICATION_TOKEN = stringPreferencesKey("auth_token")
+        val AUTHENTICATION_TOKEN = stringPreferencesKey("access_token")
     }
 }

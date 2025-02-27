@@ -39,7 +39,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeUser(user: User): Response<Boolean> {
-        val localUser = localRepository.createUser(user,)
+        val localUser = localRepository.removeUser(user)
 
         if (localUser is Response.Success) {
             return Response.Success(true)

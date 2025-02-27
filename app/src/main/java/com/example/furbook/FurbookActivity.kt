@@ -9,12 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.furbook.navigator.FurbookNavigation
-import com.example.furbook.navigator.FurbookViewModel
 import com.example.ui.theme.FurbookTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class FurbookActivity : ComponentActivity() {
 
     private val viewModel: FurbookViewModel by viewModels()
 
@@ -30,7 +29,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
 
-            // ✅ Prevent navigation from rendering until loading is done
             if (!state.isLoading) {
                 FurbookTheme(dynamicColor = false) {
                     FurbookNavigation(state)

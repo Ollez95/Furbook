@@ -58,6 +58,7 @@ fun MainScreen(
     navigator: Navigator,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {

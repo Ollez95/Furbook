@@ -1,4 +1,6 @@
-package com.example.furbook.navigator
+package com.example.furbook
+
+import com.example.furbook.navigator.FurbookState
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,12 +27,14 @@ class FurbookViewModel @Inject constructor(
     private fun checkStatus() {
         viewModelScope.launch {
             val navigationResponse = navigationHelperRepository.checkNavigationStateOnce()
+
             _state.value = FurbookState(
                 isOnboardingCompleted = navigationResponse.isOnboardingCompleted,
                 isUserAuthenticated = navigationResponse.isUserAuthenticated,
-                isLoading = false,
-                userId = navigationResponse.userId
+                isLoading = false
             )
         }
     }
+
+
 }

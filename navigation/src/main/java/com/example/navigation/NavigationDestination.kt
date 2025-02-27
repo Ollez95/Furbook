@@ -27,5 +27,5 @@ sealed class AuthenticationNavigation : NavigationDestination {
 sealed class HomeNavigation : NavigationDestination {
 
     @Serializable
-    data class Main(val userId: String = ""): HomeNavigation()
+    data object Main: HomeNavigation()
 }

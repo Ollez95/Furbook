@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,10 +15,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,6 +30,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,22 +45,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.example.home.navigation.homeGraph
 import com.example.navigation.AuthenticationNavigation
+import com.example.navigation.HomeNavigation
+import com.example.navigation.NavigationDestination
 import com.example.navigation.Navigator
-import com.example.ui.theme.FurbookTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.example.navigation.NavigatorImpl
+import com.example.ui.theme.FurbookTheme
 
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
-    navigator: Navigator,
+    navigator: Navigator
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -69,9 +84,12 @@ fun MainScreen(
     MainContent(state, viewModel::onEvent)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainContent(state: MainState = MainState(), onEvent: (MainEvent) -> Unit = {}) {
+fun MainContent(
+    state: MainState = MainState(),
+    onEvent: (MainEvent) -> Unit = {},
+    navController: NavHostController= rememberNavController())
+{
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
@@ -137,39 +155,72 @@ fun MainContent(state: MainState = MainState(), onEvent: (MainEvent) -> Unit = {
         drawerState = drawerState
     ) {
         Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Furbook", style = MaterialTheme.typography.headlineMedium) },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            coroutineScope.launch {
-                                if (drawerState.isClosed) {
-                                    drawerState.open()
-                                } else {
-                                    drawerState.close()
-                                }
-                            }
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
-                    }
-                )
-            }
+            topBar = { TopNavigationBar(coroutineScope, drawerState) },
+            bottomBar = { BottomNavigationBar(navController) }
         ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+            NavHost(
+                navController = navController,
+                startDestination = HomeNavigation.Main,
+                modifier = Modifier.padding(innerPadding)
             ) {
-                Text("Main Content", modifier = Modifier.padding(16.dp))
+                homeGraph()
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawerNavItem(title: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+fun TopNavigationBar(coroutineScope: CoroutineScope, drawerState: DrawerState) {
+    TopAppBar(
+        title = { Text("Furbook", style = MaterialTheme.typography.headlineMedium) },
+        navigationIcon = {
+            IconButton(onClick = {
+                coroutineScope.launch {
+                    if (drawerState.isClosed) {
+                        drawerState.open()
+                    } else {
+                        drawerState.close()
+                    }
+                }
+            }) {
+                Icon(Icons.Default.Menu, contentDescription = "Menu")
+            }
+        }
+    )
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    NavigationBar {
+        val currentRoute = navController.currentDestination
+
+        BottomNavItem.entries.forEach { item ->
+            NavigationBarItem(
+                icon = { Icon(item.icon, contentDescription = item.title) },
+                label = { Text(item.title) },
+                selected = currentRoute == item.route,
+                onClick = {
+                    navController.navigate(item.route) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+
+enum class BottomNavItem(val route: NavigationDestination, val title: String, val icon: ImageVector) {
+    Home(HomeNavigation.Main, "Home", Icons.Default.Home),
+    Chat(HomeNavigation.Chat, "Chat", Icons.Default.Call),
+    Inbox(HomeNavigation.Inbox, "Inbox", Icons.Default.Email)
+}
+
+
+@Composable
+fun DrawerNavItem(title: String, icon: ImageVector, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

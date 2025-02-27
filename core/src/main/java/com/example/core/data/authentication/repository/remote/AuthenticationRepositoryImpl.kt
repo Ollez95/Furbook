@@ -8,6 +8,7 @@ import com.example.core.utils.Response
 import com.example.core.utils.authentication.AuthenticationUtils.validateLoginCredentials
 import com.example.core.utils.authentication.AuthenticationUtils.validateRecoveryCredentials
 import com.example.core.utils.authentication.AuthenticationUtils.validateRegisterCredentials
+import com.example.core.utils.authentication.transformToString
 import com.example.datastore.authentication.AccessTokenDatastore
 import com.example.datastore.authentication.RefreshTokenDatastore
 import io.github.jan.supabase.auth.Auth
@@ -101,7 +102,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
                 Response.Error(NO_USER_IS_LOGGED_IN)
             } else {
                 try {
-                    auth.refreshCurrentSession()
+                    auth.refreshSession(refreshToken)
                     saveUserToken()
 
                     Timber.d(USER_IS_LOGGED_IN)
@@ -152,9 +153,10 @@ class AuthenticationRepositoryImpl @Inject constructor(
         val currentId = if (currentIdResponse is Response.Success) { currentIdResponse.data } else { "" }
         val user = auth.currentSessionOrNull()?.user
         val mail = user?.email ?: ""
-        val username = user?.userMetadata?.get("username") ?: "No user metadata"
+
+        val username = user?.userMetadata?.transformToString("username") ?: "Anonymous"
         Timber.d("User data: $currentId, $mail, $username")
-        return User(id = currentId, mail = mail, username = username.toString())
+        return User(id = currentId, mail = mail, username = username)
     }
 
     private suspend fun processRegisterUser() {

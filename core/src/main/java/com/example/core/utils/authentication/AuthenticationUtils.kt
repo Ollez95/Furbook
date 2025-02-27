@@ -4,6 +4,9 @@ import android.util.Patterns
 import com.example.core.utils.exceptions.NotValidEmail
 import com.example.core.utils.exceptions.NotValidPasswordOrEmail
 import com.example.core.utils.exceptions.NotValidUsernameEmailOrPassword
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 
 object AuthenticationUtils {
 
@@ -35,3 +38,8 @@ object AuthenticationUtils {
 
     private fun isValidPassword(password: String?) = !password.isNullOrBlank() && password.length >= 6
 }
+
+fun JsonObject?.transformToString(field: String): String {
+    return this?.get(field)?.jsonPrimitive?.contentOrNull ?: "No metadata"
+}
+

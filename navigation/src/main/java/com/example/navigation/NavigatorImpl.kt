@@ -1,10 +1,9 @@
-package com.example.furbook.navigator
+package com.example.navigation
 
 import androidx.navigation.NavController
-import com.example.navigation.NavigationDestination
-import com.example.navigation.Navigator
 
-class FurbookNavigator(private val navController: NavController) : Navigator {
+class NavigatorImpl(private val navController: NavController) : Navigator {
+
     override fun navigateToDestinationCleaningStack(destination: NavigationDestination) {
         navController.navigate(destination) {
             popUpTo(navController.graph.startDestinationId) {

@@ -1,11 +1,13 @@
 package com.example.core.database.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.core.database.local.model.UserEntity
+import com.example.core.domain.shared.model.User
 
 @Dao
 interface UserDao {
@@ -21,4 +23,7 @@ interface UserDao {
     // ✅ 3. Update Existing User
     @Update
     suspend fun updateUser(user: UserEntity)
+
+    @Query("DELETE FROM users WHERE id = :userId")
+    suspend fun removeUser(userId: String)
 }

@@ -25,12 +25,12 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun createUser(user: User): Response<Boolean> {
-        val remoteUser = remoteRepository.createUser(user)
+        val remoteUser = remoteRepository.createUser(user,)
         if (remoteUser is Response.Error) {
             return Response.Error(CREATE_USER_LOCAL_ERROR + remoteUser.message)
         }
 
-        val localUser = localRepository.createUser(user)
+        val localUser = localRepository.createUser(user,)
         if (localUser is Response.Error) {
             return Response.Error(CREATE_USER_REMOTE_ERROR + localUser.message)
         }
@@ -38,20 +38,19 @@ class UserRepositoryImpl @Inject constructor(
         return Response.Success(true) // ✅ Both operations were successful
     }
 
-    override suspend fun updateUser(user: User): Response<Boolean> {
-        val remoteUser = remoteRepository.createUser(user)
-        val localUser = localRepository.createUser(user)
+    override suspend fun removeUser(user: User): Response<Boolean> {
+        val localUser = localRepository.createUser(user,)
 
-        if (remoteUser is Response.Success && localUser is Response.Success) {
+        if (localUser is Response.Success) {
             return Response.Success(true)
         }
 
-        return Response.Error(PUT_USER_ERROR)
+        return Response.Error(DELETE_USER_ERROR)
     }
 
     companion object {
         private const val GET_USER_ERROR = "GET User error"
-        private const val PUT_USER_ERROR = "PUT User error"
+        private const val DELETE_USER_ERROR = "DELETE User error"
         private const val CREATE_USER_LOCAL_ERROR = "Failed to save user locally: "
         private const val CREATE_USER_REMOTE_ERROR = "Failed to save user remotely: "
     }

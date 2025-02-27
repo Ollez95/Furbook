@@ -32,6 +32,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
                 this.password = password
             }
 
+            processRegisterUser()
+
             saveUserToken()
             val currentId = getCurrentUserId()
 
@@ -49,15 +51,9 @@ class AuthenticationRepositoryImpl @Inject constructor(
         password: String,
         passwordConfirmation: String,
     ): Flow<Response<String>> = flow {
+
         Timber.d(START_REGISTRATION_PROCESS)
         emit(Response.Loading)
-        suspend fun processRegisterUser(userId: String) {
-            val registerResponse = userRepository.createUser(User(id = userId, mail = email, username = username))
-            if (registerResponse is Response.Error) {
-                throw Exception(registerResponse.message)
-            }
-            Timber.d(USER_CREATED_SUCCESSFULLY + userId)
-        }
 
         try {
             validateRegisterCredentials(username, email, password, passwordConfirmation)
@@ -65,8 +61,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
                 this.email = email
                 this.password = password
             }
-            val userId = auth.currentSessionOrNull()?.user?.id ?: throw Exception(USER_ID_NOT_FOUND)
-            processRegisterUser(userId)
+
+            processRegisterUser()
 
             saveUserToken()
             val currentId = getCurrentUserId()
@@ -96,20 +92,23 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun isUserLoggedIn(): Response<String> {
         return try {
-            val token = isUserLoggedInDataStore.getValueDataStoreOnce() // ✅ Uses the suspend function
+            val token = isUserLoggedInDataStore.getValueDataStoreOnce()
             if (token.isNullOrEmpty()) {
-                Timber.e(TOKEN_IS_EMPTY)
-                Response.Error(TOKEN_IS_EMPTY)
+                Timber.e(NO_USER_IS_LOGGED_IN)
+                Response.Error(NO_USER_IS_LOGGED_IN)
             } else {
                 try {
                     auth.retrieveUser(token)
                     auth.refreshCurrentSession()
                     saveUserToken()
-                    val currentId = getCurrentUserId()
 
+                    val currentId = getCurrentUserId()
                     Timber.d(USER_IS_LOGGED_IN)
                     Response.Success(currentId)
                 } catch (e: Exception) {
+                    userRepository.removeUser(User(id = getCurrentUserId()))
+                    isUserLoggedInDataStore.clearValueDatastore()
+
                     Timber.e(e.message ?: "")
                     Response.Error(handleAuthenticationException(e).message)
                 }
@@ -123,15 +122,21 @@ class AuthenticationRepositoryImpl @Inject constructor(
     override fun logout(): Flow<Response<Boolean>> = flow {
         emit(Response.Loading)
         try {
+            clearLocalDatabase()
             auth.signOut()
-            isUserLoggedInDataStore.clearValueDatastore()
             Timber.d(USER_WAS_LOGOUT)
             emit(Response.Success(true))
         } catch (e: Exception) {
+            clearLocalDatabase()
             Timber.e(e.message ?: "")
             emit(Response.Error(handleAuthenticationException(e).message))
         }
     }
+
+    override suspend fun refreshCurrentSession(): Response<Boolean> {
+        TODO()
+    }
+
 
     override suspend fun saveUserToken() {
         val token = auth.currentSessionOrNull()?.accessToken
@@ -142,12 +147,39 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     private fun getCurrentUserId() = auth.currentSessionOrNull()?.user?.id ?: throw Exception(USER_ID_NOT_FOUND)
 
+    private fun getUserData(): User {
+        val currentId = auth.currentSessionOrNull()?.user?.id ?: ""
+        val user = auth.currentSessionOrNull()?.user
+        val mail = user?.email ?: ""
+        val username = user?.userMetadata?.get("username") ?: "No user metadata"
+        Timber.d("User data: $currentId, $mail, $username")
+        return User(id = currentId, mail = mail, username = username.toString())
+    }
+
+    private suspend fun processRegisterUser() {
+        val user = getUserData()
+        val registerResponse = userRepository.createUser(user)
+        if (registerResponse is Response.Error) {
+            throw Exception(registerResponse.message)
+        }
+        Timber.d(USER_CREATED_SUCCESSFULLY + user.id)
+    }
+
+    private suspend fun clearLocalDatabase() {
+        val result = userRepository.removeUser(User(id = getCurrentUserId()))
+        if (result is Response.Error) {
+            Timber.e(result.message)
+        }
+        isUserLoggedInDataStore.clearValueDatastore()
+    }
+
     companion object {
         private const val START_REGISTRATION_PROCESS = "Starting registration process"
         private const val START_LOGIN_PROCESS = "Starting login process"
         private const val START_PASSWORD_RECOVERY_PROCESS = "Starting password recovery process"
         private const val ERROR_DURING_REGISTRATION = "Error during registration: "
         private const val ERROR_DURING_LOGIN = "Error during login: "
+        private const val NO_USER_IS_LOGGED_IN = "No user is logged in"
         private const val TOKEN_IS_EMPTY = "Token is empty"
         private const val TOKEN_WAS_SUCCESSFULLY_SAVED = "Token was successfully saved"
         private const val REGISTRATION_WAS_SUCCESSFUL = "Registration process completed successfully"

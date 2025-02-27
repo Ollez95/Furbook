@@ -13,6 +13,7 @@ class NavigationHelperRepository @Inject constructor(
     // ✅ Use suspend function instead of Flow
     suspend fun checkNavigationStateOnce(): NavigationResponse {
         var token = ""
+        var isLoggedIn = false
 
         val wasOnboardingExecuted = try {
             wasOnBoardingExecutedDatastore.getValueDataStoreOnce() ?: false
@@ -20,16 +21,18 @@ class NavigationHelperRepository @Inject constructor(
             false
         }
 
-        val isLoggedIn = try {
-            when (val loginResponse = isUserLoggedInUseCase.invoke()) {
-                is Response.Success -> {
-                    token = loginResponse.data
-                    true
+        if(wasOnboardingExecuted){
+            isLoggedIn = try {
+                when (val loginResponse = isUserLoggedInUseCase.invoke()) {
+                    is Response.Success -> {
+                        token = loginResponse.data
+                        true
+                    }
+                    else -> false
                 }
-                else -> false
+            } catch (_: Exception) {
+                false
             }
-        } catch (_: Exception) {
-            false
         }
 
         return NavigationResponse(wasOnboardingExecuted, isLoggedIn, token)

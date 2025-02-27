@@ -10,4 +10,5 @@ interface AuthenticationRepository {
     suspend fun saveUserToken()
     suspend fun isUserLoggedIn(): Response<String>
     fun logout(): Flow<Response<Boolean>>
+    suspend fun refreshCurrentSession(): Response<Boolean>
 }

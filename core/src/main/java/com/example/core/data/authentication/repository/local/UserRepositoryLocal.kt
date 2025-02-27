@@ -37,9 +37,9 @@ class UserRepositoryLocal @Inject constructor(
         }
     }
 
-    override suspend fun updateUser(user: User): Response<Boolean> {
+    override suspend fun removeUser(user: User): Response<Boolean> {
         return try {
-            userDao.updateUser(user.toEntity())
+            userDao.removeUser(user.id ?: "")
             Timber.d(UPDATE_USER_ID_SUCCESS + user.id)
             Response.Success(true)
         } catch (e: Exception) {

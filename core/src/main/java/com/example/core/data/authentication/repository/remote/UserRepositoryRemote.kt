@@ -3,19 +3,20 @@ package com.example.core.data.authentication.repository.remote
 import com.example.core.domain.authentication.repository.UserRepository
 import com.example.core.domain.shared.model.User
 import com.example.core.utils.Response
-import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.from
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class UserRepositoryRemote @Inject constructor(
-    private val postgrest: Postgrest,
+    private val client: SupabaseClient,
 ) : UserRepository {
 
     override suspend fun getUserById(id: String): Response<User> {
         return try {
-            val result = postgrest[USERS_DATABASE]
+            val result = client.from(USERS_DATABASE)
                 .select { filter { User::id eq id } }
                 .decodeSingle<User>()
 
@@ -29,7 +30,6 @@ class UserRepositoryRemote @Inject constructor(
 
     override suspend fun createUser(user: User): Response<Boolean> {
         return try {
-            postgrest[USERS_DATABASE].insert(user) // ✅ Ensure `id` & `created_at` are not sent
             Timber.d(CREATE_USER_ID_SUCCESS + user.id)
             Response.Success(true)
         } catch (e: Exception) {
@@ -38,12 +38,8 @@ class UserRepositoryRemote @Inject constructor(
         }
     }
 
-    override suspend fun updateUser(user: User): Response<Boolean> {
+    override suspend fun removeUser(user: User): Response<Boolean> {
         return try {
-            postgrest[USERS_DATABASE]
-                .update(user) {
-                    filter { User::id eq user.id }
-                }
             Timber.d(UPDATE_USER_ID_SUCCESS + user.id)
             Response.Success(true)
         } catch (e: Exception) {

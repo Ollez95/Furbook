@@ -1,7 +1,13 @@
 buildscript {
     repositories {
         // Make sure that you have the following two repositories
-        google()  // Google's Maven repository
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
         mavenCentral()  // Maven Central repository
 
     }

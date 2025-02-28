@@ -13,8 +13,10 @@ import com.example.datastore.authentication.AccessTokenDatastore
 import com.example.datastore.authentication.RefreshTokenDatastore
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import timber.log.Timber
@@ -57,7 +59,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
         Timber.d(START_REGISTRATION_PROCESS)
         emit(Response.Loading)
-
         try {
             validateRegisterCredentials(username, email, password, passwordConfirmation)
             auth.signUpWith(Email) {
@@ -78,7 +79,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
             emit(Response.Error(handleAuthenticationException(e).message))
             Timber.i(TODO_ROLLBACK)
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun recoverPassword(email: String): Flow<Response<Boolean>> = flow {
         Timber.d(START_PASSWORD_RECOVERY_PROCESS)

@@ -64,7 +64,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.navigation.NavigatorImpl
 import com.example.ui.theme.FurbookTheme
 
 @Composable

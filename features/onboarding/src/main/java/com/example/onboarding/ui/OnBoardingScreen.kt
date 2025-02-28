@@ -35,11 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.navigation.AuthenticationNavigation
-import com.example.navigation.Navigator
+import androidx.navigation.NavController
 import com.example.core.data.onboarding.local.OnBoardingFakeData
 import com.example.core.data.onboarding.model.OnBoardingModel
+import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.OnBoardingNavigation
+import com.example.navigation.navigateToDestinationCleaningStack
 import com.example.ui.theme.FurbookTheme
 import com.example.ui.theme.Space.space2XSmall
 import com.example.ui.theme.Space.spaceLarge
@@ -50,7 +51,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun OnBoardingScreen(
     viewModel: OnBoardingViewModel = hiltViewModel(),
-    navigator: Navigator,
+    navController: NavController,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -59,8 +60,8 @@ fun OnBoardingScreen(
         viewModel.eventFlow.collect { event ->
             when (event) {
                 is OnBoardingEvent.Finish ->
-                    navigator
-                    .navigateToDestinationCleaningStack(true, OnBoardingNavigation.Onboarding, AuthenticationNavigation.Login)
+                    navController
+                        .navigateToDestinationCleaningStack(true, OnBoardingNavigation.Onboarding, AuthenticationNavigation.Login)
             }
         }
     }

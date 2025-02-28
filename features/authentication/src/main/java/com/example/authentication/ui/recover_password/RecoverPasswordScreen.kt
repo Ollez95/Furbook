@@ -30,9 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.authentication.ui.composables.EmailOutlinedTextField
 import com.example.navigation.AuthenticationNavigation
-import com.example.navigation.Navigator
+import com.example.navigation.navigateBack
+import com.example.navigation.navigateWithSafety
 import com.example.ui.composables.WaveBackground
 import com.example.ui.theme.FurbookTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -40,7 +43,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun RecoverPasswordScreen(
     viewModel: RecoverPasswordViewModel = hiltViewModel(),
-    navigator: Navigator
+    navController: NavController,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -48,8 +51,8 @@ fun RecoverPasswordScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                RecoverPasswordEvent.NavigateToLogin -> navigator.navigateBack()
-                RecoverPasswordEvent.RecoverPasswordSuccess -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
+                RecoverPasswordEvent.NavigateToLogin -> navController.navigateBack()
+                RecoverPasswordEvent.RecoverPasswordSuccess -> navController.navigateWithSafety(AuthenticationNavigation.Login)
                 is RecoverPasswordEvent.RecoverPasswordError -> snackBarHostState.showSnackbar(event.message)
             }
         }

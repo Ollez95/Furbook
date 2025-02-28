@@ -58,25 +58,23 @@ import com.example.home.navigation.homeGraph
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.HomeNavigation
 import com.example.navigation.NavigationDestination
-import com.example.navigation.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.navigation.logBackStack
+import com.example.navigation.navigateToDestinationCleaningStack
 import com.example.ui.theme.FurbookTheme
 
 @Composable
-fun MainScreen(
-    viewModel: MainViewModel = hiltViewModel(),
-    navigator: Navigator
-) {
+fun MainScreen(viewModel: MainViewModel = hiltViewModel(), appNavController: NavController) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                MainEvent.LogoutSuccess -> navigator.navigateToDestinationCleaningStack(
+                MainEvent.LogoutSuccess -> appNavController.navigateToDestinationCleaningStack(
                     true,
                     HomeNavigation.Main,
                     AuthenticationNavigation.Login)
@@ -90,7 +88,8 @@ fun MainScreen(
 fun MainContent(
     state: MainState = MainState(),
     onEvent: (MainEvent) -> Unit = {},
-    navController: NavHostController= rememberNavController())
+    navController: NavHostController = rememberNavController()
+)
 {
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -196,7 +195,6 @@ fun TopNavigationBar(coroutineScope: CoroutineScope, drawerState: DrawerState) {
 fun BottomNavigationBar(navController: NavController) {
     NavigationBar {
         val currentRoute = navController.currentDestination
-
         BottomNavItem.entries.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.title) },
@@ -208,6 +206,7 @@ fun BottomNavigationBar(navController: NavController) {
                         launchSingleTop = true
                         restoreState = true
                     }
+                    navController.logBackStack()
                 }
             )
         }
@@ -240,6 +239,6 @@ fun DrawerNavItem(title: String, icon: ImageVector, onClick: () -> Unit) {
 @Composable
 private fun OnBoardingScreenPreview() {
     FurbookTheme {
-        MainContent()
+        //MainContent()
     }
 }

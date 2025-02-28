@@ -37,13 +37,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.authentication.ui.composables.EmailOutlinedTextField
 import com.example.authentication.ui.composables.PasswordOutlinedTextField
 import com.example.authentication.ui.composables.RegisterText
 import com.example.core.domain.authentication.login.models.LoginModel
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.HomeNavigation
-import com.example.navigation.Navigator
+import com.example.navigation.navigateToDestination
+import com.example.navigation.navigateToDestinationCleaningStack
 import com.example.ui.composables.Logo
 import com.example.ui.composables.WaveBackground
 import com.example.ui.theme.FurbookTheme
@@ -53,7 +56,7 @@ import timber.log.Timber
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-    navigator: Navigator,
+    navController: NavController,
 ) {
     Timber.d("LoginScreen was created")
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -62,10 +65,10 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                is LoginEvent.LoginSuccess -> navigator.navigateToDestinationCleaningStack(true, AuthenticationNavigation.Login, HomeNavigation.Main)
+                is LoginEvent.LoginSuccess -> navController.navigateToDestinationCleaningStack(true, AuthenticationNavigation.Login, HomeNavigation.Main)
                 is LoginEvent.LoginError -> snackBarHostState.showSnackbar(event.message)
-                LoginEvent.NavigateToSignUp -> navigator.navigateToDestination(AuthenticationNavigation.Register)
-                LoginEvent.NavigateToForgotPassword -> navigator.navigateToDestination(AuthenticationNavigation.RecoverPassword(state.loginModel.email))
+                LoginEvent.NavigateToSignUp -> navController.navigateToDestination(AuthenticationNavigation.Register)
+                LoginEvent.NavigateToForgotPassword -> navController.navigateToDestination(AuthenticationNavigation.RecoverPassword(state.loginModel.email))
             }
         }
     }
@@ -129,8 +132,7 @@ private fun LoginContent(
                     onClick = { onEvent(LoginEvent.Login) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 32.dp)
-                        ,
+                        .padding(horizontal = 32.dp),
                     shape = MaterialTheme.shapes.large,
                     enabled = !state.isLoading
                 ) {
@@ -193,7 +195,7 @@ private fun LoginContent(
 private fun LoginScreenPreview() {
     FurbookTheme {
         LoginContent(state = LoginState(loginModel = LoginModel("test@example.com")),
-            snackBarHostState = SnackbarHostState() , // Example state
+            snackBarHostState = SnackbarHostState(), // Example state
             onEvent = {}  // Empty handler for preview
         )
     }

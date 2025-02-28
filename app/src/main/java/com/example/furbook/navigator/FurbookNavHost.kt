@@ -1,9 +1,6 @@
 package com.example.furbook.navigator
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,26 +11,23 @@ import com.example.home.ui.main.MainScreen
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.HomeNavigation
 import com.example.navigation.NavigationDestination
-import com.example.navigation.NavigatorImpl
 import com.example.navigation.OnBoardingNavigation
 import com.example.onboarding.navigation.onBoardingGraph
-import kotlinx.coroutines.flow.forEach
 
 
 @Composable
 fun FurbookNavigation(state: FurbookState) {
     val navController: NavHostController = rememberNavController()
-    val navigator = NavigatorImpl(navController)
 
     NavHost(navController = navController,
         startDestination = startDestination(state))
     {
-        onBoardingGraph(navigator = navigator)
-        authenticationGraph(navigator = navigator)
+        onBoardingGraph(navController = navController)
+        authenticationGraph(navController = navController)
 
         navigation<HomeNavigation.Home>(startDestination = HomeNavigation.Main) {
             composable<HomeNavigation.Main>{
-                MainScreen(navigator = navigator)
+                MainScreen(appNavController = navController)
             }
         }
     }

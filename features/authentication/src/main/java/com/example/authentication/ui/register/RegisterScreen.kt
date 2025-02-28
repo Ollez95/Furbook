@@ -33,11 +33,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.example.authentication.ui.composables.EmailOutlinedTextField
 import com.example.authentication.ui.composables.PasswordWithoutIconOutlinedTextField
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.HomeNavigation
-import com.example.navigation.Navigator
+import com.example.navigation.navigateBack
+import com.example.navigation.navigateToDestinationCleaningStack
 import com.example.ui.R
 import com.example.ui.composables.WaveBackground
 import com.example.ui.theme.FurbookTheme
@@ -46,7 +48,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel(),
-    navigator: Navigator,
+    navController: NavController,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -54,12 +56,12 @@ fun RegisterScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                RegisterEvent.RegisterSuccess -> navigator.navigateToDestinationCleaningStack(
+                RegisterEvent.RegisterSuccess -> navController.navigateToDestinationCleaningStack(
                     true,
                     AuthenticationNavigation.Register,
                     HomeNavigation.Main)
                 is RegisterEvent.RegisterError -> snackBarHostState.showSnackbar(event.message)
-                RegisterEvent.NavigateToLogin -> navigator.navigateBack()
+                RegisterEvent.NavigateToLogin -> navController.navigateBack()
             }
         }
     }

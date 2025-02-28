@@ -67,4 +67,7 @@ dependencies {
 
     //extended icons
     implementation(libs.androidx.material3.icons.extended)
+
+    // Timber
+    implementation(libs.timber)
 }

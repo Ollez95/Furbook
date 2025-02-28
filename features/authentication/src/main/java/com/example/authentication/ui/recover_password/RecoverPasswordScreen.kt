@@ -48,7 +48,7 @@ fun RecoverPasswordScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                RecoverPasswordEvent.NavigateToLogin -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
+                RecoverPasswordEvent.NavigateToLogin -> navigator.navigateBack()
                 RecoverPasswordEvent.RecoverPasswordSuccess -> navigator.navigateWithSafety(AuthenticationNavigation.Login)
                 is RecoverPasswordEvent.RecoverPasswordError -> snackBarHostState.showSnackbar(event.message)
             }

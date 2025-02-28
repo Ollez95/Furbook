@@ -48,22 +48,24 @@ import com.example.ui.composables.Logo
 import com.example.ui.composables.WaveBackground
 import com.example.ui.theme.FurbookTheme
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     navigator: Navigator,
 ) {
+    Timber.d("LoginScreen was created")
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                is LoginEvent.LoginSuccess -> navigator.navigateToDestinationCleaningStack(HomeNavigation.Main)
+                is LoginEvent.LoginSuccess -> navigator.navigateToDestinationCleaningStack(true, AuthenticationNavigation.Login, HomeNavigation.Main)
                 is LoginEvent.LoginError -> snackBarHostState.showSnackbar(event.message)
-                LoginEvent.NavigateToSignUp -> navigator.navigateWithSafety(AuthenticationNavigation.Register)
-                LoginEvent.NavigateToForgotPassword -> navigator.navigateWithSafety(AuthenticationNavigation.RecoverPassword(state.loginModel.email))
+                LoginEvent.NavigateToSignUp -> navigator.navigateToDestination(AuthenticationNavigation.Register)
+                LoginEvent.NavigateToForgotPassword -> navigator.navigateToDestination(AuthenticationNavigation.RecoverPassword(state.loginModel.email))
             }
         }
     }

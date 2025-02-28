@@ -1,6 +1,9 @@
 package com.example.furbook.navigator
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,6 +17,7 @@ import com.example.navigation.NavigationDestination
 import com.example.navigation.NavigatorImpl
 import com.example.navigation.OnBoardingNavigation
 import com.example.onboarding.navigation.onBoardingGraph
+import kotlinx.coroutines.flow.forEach
 
 
 @Composable
@@ -42,4 +46,6 @@ private fun startDestination(state: FurbookState): NavigationDestination {
         else -> HomeNavigation.Home
     }
 }
+
+
 

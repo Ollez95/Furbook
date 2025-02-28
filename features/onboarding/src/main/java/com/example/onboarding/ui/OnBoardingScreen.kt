@@ -39,6 +39,7 @@ import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.Navigator
 import com.example.core.data.onboarding.local.OnBoardingFakeData
 import com.example.core.data.onboarding.model.OnBoardingModel
+import com.example.navigation.OnBoardingNavigation
 import com.example.ui.theme.FurbookTheme
 import com.example.ui.theme.Space.space2XSmall
 import com.example.ui.theme.Space.spaceLarge
@@ -57,7 +58,9 @@ fun OnBoardingScreen(
         viewModel.getOnBoardingData()
         viewModel.eventFlow.collect { event ->
             when (event) {
-                is OnBoardingEvent.Finish -> navigator.navigateToDestinationCleaningStack(AuthenticationNavigation.Login)
+                is OnBoardingEvent.Finish ->
+                    navigator
+                    .navigateToDestinationCleaningStack(true, OnBoardingNavigation.Onboarding, AuthenticationNavigation.Login)
             }
         }
     }

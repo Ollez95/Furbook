@@ -8,7 +8,7 @@ buildscript {
                 includeGroupByRegex("androidx.*")
             }
         }
-        mavenCentral()  // Maven Central repository
+        mavenCentral()   // Maven Central repository
 
     }
     dependencies {

@@ -76,7 +76,10 @@ fun MainScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                MainEvent.LogoutSuccess -> navigator.navigateBackUntil(AuthenticationNavigation.Login)
+                MainEvent.LogoutSuccess -> navigator.navigateToDestinationCleaningStack(
+                    true,
+                    HomeNavigation.Main,
+                    AuthenticationNavigation.Login)
             }
         }
     }

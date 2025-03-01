@@ -1,5 +1,6 @@
 package com.example.home.ui.main
 
+import androidx.compose.ui.unit.fontscaling.MathUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.authentication.login.usecase.LogoutAccountUseCase
@@ -41,6 +42,7 @@ class MainViewModel @Inject constructor(
     fun onEvent(event: MainEvent) {
         when (event) {
             is MainEvent.Logout -> logout()
+            is MainEvent.OpenCloseDrawer -> viewModelScope.launch { _eventFlow.emit(MainEvent.OpenCloseDrawer) }
             else -> { /* Ignore */
             }
         }

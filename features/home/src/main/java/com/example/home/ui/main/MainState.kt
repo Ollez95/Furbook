@@ -4,5 +4,5 @@ import com.example.core.domain.shared.model.User
 
 data class MainState(
     val isLoading: Boolean = false,
-    val user: User = User(),
+    val user: User = User()
 )

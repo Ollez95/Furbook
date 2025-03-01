@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.authentication.ui.composables.EmailOutlinedTextField
 import com.example.authentication.ui.composables.PasswordOutlinedTextField
 import com.example.authentication.ui.composables.RegisterText
@@ -65,7 +64,7 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                is LoginEvent.LoginSuccess -> navController.navigateToDestinationCleaningStack(true, AuthenticationNavigation.Login, HomeNavigation.Main)
+                is LoginEvent.LoginSuccess -> navController.navigateToDestinationCleaningStack(AuthenticationNavigation.Login, HomeNavigation.Main)
                 is LoginEvent.LoginError -> snackBarHostState.showSnackbar(event.message)
                 LoginEvent.NavigateToSignUp -> navController.navigateToDestination(AuthenticationNavigation.Register)
                 LoginEvent.NavigateToForgotPassword -> navController.navigateToDestination(AuthenticationNavigation.RecoverPassword(state.loginModel.email))

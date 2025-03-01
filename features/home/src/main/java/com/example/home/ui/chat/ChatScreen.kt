@@ -1,6 +1,5 @@
 package com.example.home.ui.chat
 
-import android.provider.SyncStateContract.Columns
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,11 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ChatScreen(innerPadding: PaddingValues) {
+fun ChatScreen() {
     Column {
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -26,25 +24,24 @@ fun ChatScreen(innerPadding: PaddingValues) {
 }
 
 @Composable
-fun MainScreen(innerPadding: PaddingValues) {
+fun HomeScreen() {
     Column {
         Column(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding()
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Main Content", modifier = Modifier.padding(16.dp))
+            Text("Home Content", modifier = Modifier.padding(16.dp))
         }
     }
 }
 
 @Composable
-fun InboxScreen(innerPadding: PaddingValues) {
+fun InboxScreen() {
     Column {
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

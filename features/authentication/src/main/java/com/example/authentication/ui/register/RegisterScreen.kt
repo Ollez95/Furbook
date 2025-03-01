@@ -57,9 +57,8 @@ fun RegisterScreen(
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 RegisterEvent.RegisterSuccess -> navController.navigateToDestinationCleaningStack(
-                    true,
-                    AuthenticationNavigation.Register,
-                    HomeNavigation.Main)
+                    navigationToClean = AuthenticationNavigation.Register,
+                    navigateToDestination = HomeNavigation.Main)
                 is RegisterEvent.RegisterError -> snackBarHostState.showSnackbar(event.message)
                 RegisterEvent.NavigateToLogin -> navController.navigateBack()
             }

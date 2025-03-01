@@ -61,7 +61,9 @@ fun OnBoardingScreen(
             when (event) {
                 is OnBoardingEvent.Finish ->
                     navController
-                        .navigateToDestinationCleaningStack(true, OnBoardingNavigation.Onboarding, AuthenticationNavigation.Login)
+                        .navigateToDestinationCleaningStack(
+                            navigationToClean = OnBoardingNavigation.Onboarding,
+                            navigateToDestination =  AuthenticationNavigation.Login)
             }
         }
     }

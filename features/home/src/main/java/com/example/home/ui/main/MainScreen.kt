@@ -50,9 +50,12 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel(), appNavController: Nav
             when (event) {
                 MainEvent.LogoutSuccess -> appNavController
                     .navigateToDestinationCleaningStack(
-                    navigationToClean = HomeNavigation.Main,
-                    navigateToDestination = AuthenticationNavigation.Login
-                )
+                        navigationToClean = HomeNavigation.Main,
+                        navigateToDestination = AuthenticationNavigation.Login,
+                        restorePreviousState = false,
+                        useTheSameInstance = false
+                    )
+
                 MainEvent.OpenCloseDrawer -> {
                     if (drawerState.isClosed) {
                         drawerState.open()

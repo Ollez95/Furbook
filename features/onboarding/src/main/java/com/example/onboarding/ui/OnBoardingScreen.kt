@@ -29,6 +29,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.airbnb.lottie.LottieComposition
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.core.data.onboarding.local.OnBoardingFakeData
 import com.example.core.data.onboarding.model.OnBoardingModel
 import com.example.navigation.AuthenticationNavigation
@@ -68,7 +76,7 @@ fun OnBoardingScreen(
         }
     }
 
-    OnBoardingContent(state = state, onEvent = { event ->
+    OnBoardingContent(viewModel, state = state, onEvent = { event ->
         viewModel.onEvent(event)
     })
 }
@@ -76,6 +84,7 @@ fun OnBoardingScreen(
 
 @Composable
 fun OnBoardingContent(
+    viewModel: OnBoardingViewModel,
     state: OnBoardingState = OnBoardingState(),
     onEvent: (OnBoardingEvent) -> Unit = {},
 ) {
@@ -102,7 +111,23 @@ fun OnBoardingContent(
                 modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
             ) {
                 HorizontalPager(state = pagerState) { page ->
-                    OnboardingPageContent(page = onBoardingPages[page])
+
+                    val compositionObject = viewModel.getLottieComposition(onBoardingPages[page].image)
+
+                    val composition by rememberLottieComposition(
+                        LottieCompositionSpec.RawRes(onBoardingPages[page].image)
+                    )
+
+                    val progress by animateLottieCompositionAsState(
+                        composition = composition,
+                        iterations = LottieConstants.IterateForever,
+                    )
+
+                    OnboardingPageContent(
+                        page = onBoardingPages[page],
+                        composition = compositionObject,
+                        progress = progress
+                    )
                 }
 
                 // Page Indicators
@@ -150,16 +175,27 @@ fun OnBoardingContent(
 }
 
 
+
+
 @Composable
-fun OnboardingPageContent(page: OnBoardingModel) {
-    Column(
-        Modifier.padding(spaceMedium), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(id = page.image), contentDescription = null, modifier = Modifier
-                .size(250.dp)
-                .clip(RoundedCornerShape(spaceMedium))
-        )
+fun OnboardingPageContent(page: OnBoardingModel, composition: LottieComposition?, progress: Float) {
+    Column(Modifier.padding(spaceMedium),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
+        if(composition == null) {
+            Box(
+                modifier = Modifier
+                    .size(250.dp)
+                    .shimmerEffect()
+            )
+        }else{
+            LottieAnimation(
+                composition = composition,
+                progress = { progress }, // ✅ Use animated progress
+                modifier = Modifier.size(250.dp)
+            )
+        }
+
         Spacer(modifier = Modifier.height(spaceLarge))
         Text(text = stringResource(id = page.title), style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(spaceXSmall))
@@ -180,6 +216,21 @@ fun Indicator(isSelected: Boolean) {
     )
 }
 
+@Composable
+fun Modifier.shimmerEffect(): Modifier {
+    return this.background(
+        brush = Brush.linearGradient(
+            colors = listOf(
+                Color.LightGray.copy(alpha = 0.9f),
+                Color.LightGray.copy(alpha = 0.3f),
+                Color.LightGray.copy(alpha = 0.9f)
+            )
+        ),
+        shape = RoundedCornerShape(8.dp)
+    )
+}
+
+
 @Preview(
     name = "Light Mode", showBackground = true
 )
@@ -189,7 +240,7 @@ fun Indicator(isSelected: Boolean) {
 @Composable
 private fun OnBoardingScreenPreview() {
     FurbookTheme {
-        val onBoardingState = OnBoardingState(listBoardingModel = OnBoardingFakeData.onBoardingData)
-        OnBoardingContent(onBoardingState)
+        //val onBoardingState = OnBoardingState(listBoardingModel = OnBoardingFakeData.onBoardingData)
+        //OnBoardingContent(onBoardingState)
     }
 }

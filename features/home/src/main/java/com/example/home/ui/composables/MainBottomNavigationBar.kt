@@ -4,9 +4,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -76,9 +78,9 @@ sealed class BottomNavItem(
 
     data object Chat : BottomNavItem(
         route = HomeNavigation.Chat,
-        title = "Chat",
-        iconSelected = Icons.Filled.Call,
-        iconNotSelected = Icons.Outlined.Call
+        title = "Pet Buddies",
+        iconSelected = Icons.Filled.Pets,
+        iconNotSelected = Icons.Outlined.Pets
     )
 
     data object Inbox : BottomNavItem(

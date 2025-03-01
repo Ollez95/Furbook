@@ -34,14 +34,16 @@ fun NavController.navigateWithSafety(destination: NavigationDestination) {
 fun NavController.navigateToDestinationCleaningStack(
     navigationToClean: NavigationDestination,
     navigateToDestination: NavigationDestination,
+    saveCurrentState: Boolean = true,
     cleanCurrentNavigation: Boolean = true,
     useTheSameInstance: Boolean = true,
-    restorePreviousState: Boolean = true
+    restorePreviousState: Boolean = true,
 
 ) {
     addThrottleTime()
     navigate(navigateToDestination) {
         popUpTo(navigationToClean) {
+            saveState = saveCurrentState
             inclusive = cleanCurrentNavigation
         }
         launchSingleTop = useTheSameInstance

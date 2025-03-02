@@ -11,7 +11,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun HomeContent(modifier: Modifier = Modifier) {
-
     Column {
 
     }

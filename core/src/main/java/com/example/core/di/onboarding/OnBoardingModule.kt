@@ -3,6 +3,7 @@ package com.example.core.di.onboarding
 import android.content.Context
 import com.example.core.data.onboarding.repository.LottieRepositoryImpl
 import com.example.core.data.onboarding.repository.OnBoardingRepositoryImpl
+import com.example.core.di.module.IoDispatcher
 import com.example.core.domain.onboarding.repository.LottieRepository
 import com.example.core.domain.onboarding.repository.OnBoardingRepository
 import dagger.Module
@@ -10,6 +11,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
 
 @Module
@@ -21,7 +23,8 @@ object OnBoardingModule {
 
     @Provides
     @Singleton
-    fun provideLottieRepository(@ApplicationContext context: Context): LottieRepository {
-        return LottieRepositoryImpl(context)
+    fun provideLottieRepository(@ApplicationContext context: Context,
+                                @IoDispatcher ioDispatcher: CoroutineDispatcher): LottieRepository {
+        return LottieRepositoryImpl(context, ioDispatcher)
     }
 }

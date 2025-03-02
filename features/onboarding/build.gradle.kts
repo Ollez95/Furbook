@@ -34,6 +34,8 @@ android {
         compose = true
         buildConfig = true
     }
+
+    packaging { resources.excludes.add("META-INF/*") }
 }
 
 dependencies {
@@ -64,7 +66,13 @@ dependencies {
     ksp(libs.androidx.hilt.compiler)
     implementation(libs.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
+    androidTestImplementation(libs.hilt.android.testing)
 
     // Lottie
     implementation(libs.lottie.compose)
+
+    // Testing mockk
+    testImplementation(libs.mockk) // For unit tests
+    androidTestImplementation(libs.mockk.android) // For Android tests
+
 }

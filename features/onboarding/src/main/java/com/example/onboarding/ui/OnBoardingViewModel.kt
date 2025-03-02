@@ -27,9 +27,6 @@ class OnBoardingViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<OnBoardingEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private val _composition = MutableStateFlow<LottieComposition?>(null)
-    val composition: StateFlow<LottieComposition?> = _composition
-
     fun getOnBoardingData() {
         val onBoardingData = onBoardingRepository.getOnBoardingData()
         _state.value = OnBoardingState(listBoardingModel = onBoardingData)
@@ -46,7 +43,7 @@ class OnBoardingViewModel @Inject constructor(
         }
     }
 
-    fun getLottieComposition(animationResId: Int): LottieComposition? {
+    fun getLottieComposition(animationResId: Int): LottieComposition {
         return lottieRepository.getLottieComposition(animationResId)
 
     }

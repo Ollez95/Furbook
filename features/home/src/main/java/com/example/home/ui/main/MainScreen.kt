@@ -52,7 +52,6 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel(), appNavController: Nav
                     .navigateToDestinationCleaningStack(
                         navigationToClean = HomeNavigation.Main,
                         navigateToDestination = AuthenticationNavigation.Login,
-                        restorePreviousState = false,
                         useTheSameInstance = false
                     )
 

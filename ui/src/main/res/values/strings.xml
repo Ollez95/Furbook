@@ -1,9 +1,9 @@
 <resources>
     // On Boarding Screen
-    <string name="on_boarding_title_1">Neque porro quisquam est qui dolorem</string>
-    <string name="on_boarding_description_1">Lorem ipsum odor amet, consectetuer adipiscing elit. Ante malesuada velit at dolor fames velit integer</string>
-    <string name="on_boarding_title_2">Lorem ipsum odor amet</string>
-    <string name="on_boarding_description_2">Lorem ipsum odor amet, consectetuer adipiscing elit. Ante malesuada velit at dolor fames velit integer</string>
-    <string name="on_boarding_title_3">Lorem ipsum odor amet</string>
-    <string name="on_boarding_description_3">Lorem ipsum odor amet, consectetuer adipiscing elit. Ante malesuada velit at dolor fames velit integer</string>
+    <string name="on_boarding_title_1">Neque porro quisquam est qui dolorem 1</string>
+    <string name="on_boarding_description_1">Lorem ipsum odor amet, consectetuer adipiscing elit. Ante malesuada velit at dolor fames velit integer 1</string>
+    <string name="on_boarding_title_2">Lorem ipsum odor amet 2</string>
+    <string name="on_boarding_description_2">Lorem ipsum odor amet, consectetuer adipiscing elit. Ante malesuada velit at dolor fames velit integer 2</string>
+    <string name="on_boarding_title_3">Lorem ipsum odor amet 3</string>
+    <string name="on_boarding_description_3">Lorem ipsum odor amet, consectetuer adipiscing elit. Ante malesuada velit at dolor fames velit integer 3</string>
 </resources>

@@ -34,11 +34,10 @@ fun NavController.navigateWithSafety(destination: NavigationDestination) {
 fun NavController.navigateToDestinationCleaningStack(
     navigationToClean: NavigationDestination,
     navigateToDestination: NavigationDestination,
-    saveCurrentState: Boolean = true,
-    cleanCurrentNavigation: Boolean = true,
-    useTheSameInstance: Boolean = true,
-    restorePreviousState: Boolean = true,
-
+    saveCurrentState: Boolean = false,  // 🔹 False to avoid unnecessary state restoration
+    cleanCurrentNavigation: Boolean = true,  // 🔹 True to remove the cleaned destination
+    useTheSameInstance: Boolean = true,  // 🔹 True to prevent duplicate instances
+    restorePreviousState: Boolean = false, // 🔹 False to avoid restoring previous states incorrectly
 ) {
     addThrottleTime()
     navigate(navigateToDestination) {
@@ -51,6 +50,7 @@ fun NavController.navigateToDestinationCleaningStack(
     }
     logBackStack()
 }
+
 
 @SuppressLint("RestrictedApi")
 fun NavController.logBackStack() {

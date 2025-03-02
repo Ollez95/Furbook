@@ -22,8 +22,8 @@ class NavigationHelperRepository @Inject constructor(
 
         val wasOnboardingExecuted = try {
             val onBoardingDataStore = wasOnBoardingExecutedDatastore.getValueDataStoreOnce() ?: false
-            val lottieFilesWereLoaded = lottieRepository.loadAllLottieFiles()
-            onBoardingDataStore && lottieFilesWereLoaded
+            lottieRepository.loadAllLottieFiles()
+            onBoardingDataStore
         } catch (_: Exception) {
             false
         }

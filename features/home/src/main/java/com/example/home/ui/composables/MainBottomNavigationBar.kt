@@ -1,11 +1,9 @@
 package com.example.home.ui.composables
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Pets
@@ -55,7 +53,10 @@ fun MainBottomNavigationBar(
                         navController.navigateToDestinationCleaningStack(
                             navigationToClean = HomeNavigation.Main,
                             navigateToDestination = item.route,
-                            cleanCurrentNavigation = false
+                            cleanCurrentNavigation = false,
+                            useTheSameInstance = true,
+                            restorePreviousState = true,
+                            saveCurrentState = true
                         )
                     }
                 }

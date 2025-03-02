@@ -25,16 +25,19 @@
       <SelectionState runConfigName="core">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onBoardingScreenPreview">
+      <SelectionState runConfigName="ExampleInstrumentedTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="LoginScreenPreview">
+      <SelectionState runConfigName="onboardingScreen_showsFirstPageContent()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="RegisterScreenPreview">
+      <SelectionState runConfigName="onboardingScreen_canNavigateToNextPage()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="OnBoardingScreenPreview">
+      <SelectionState runConfigName="onboardingScreen_canSkipToFinalPage()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="OnBoardingContentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

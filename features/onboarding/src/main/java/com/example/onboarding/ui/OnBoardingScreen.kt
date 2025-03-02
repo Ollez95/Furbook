@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,16 +40,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.airbnb.lottie.LottieComposition
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.example.core.data.onboarding.local.OnBoardingFakeData
 import com.example.core.data.onboarding.model.OnBoardingModel
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.OnBoardingNavigation
 import com.example.navigation.navigateToDestinationCleaningStack
+import com.example.ui.composables.AnimatedPreloader
 import com.example.ui.theme.FurbookTheme
 import com.example.ui.theme.Space.space2XSmall
 import com.example.ui.theme.Space.spaceLarge
@@ -76,17 +72,18 @@ fun OnBoardingScreen(
         }
     }
 
-    OnBoardingContent(viewModel, state = state, onEvent = { event ->
-        viewModel.onEvent(event)
-    })
+    OnBoardingContent(
+        state = state,
+        onEvent = { event -> viewModel.onEvent(event) },
+        addLottieComposition = { viewModel.getLottieComposition(it) })
 }
 
 
 @Composable
 fun OnBoardingContent(
-    viewModel: OnBoardingViewModel,
     state: OnBoardingState = OnBoardingState(),
     onEvent: (OnBoardingEvent) -> Unit = {},
+    addLottieComposition: (Int) -> LottieComposition,
 ) {
     val onBoardingPages = state.listBoardingModel
     val pagerState = rememberPagerState(pageCount = { onBoardingPages.size })
@@ -103,6 +100,7 @@ fun OnBoardingContent(
                 onClick = { onEvent(OnBoardingEvent.Finish) }, modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(spaceMedium)
+                    .testTag("skip_button")
             ) {
                 Text("Skip")
             }
@@ -111,22 +109,10 @@ fun OnBoardingContent(
                 modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
             ) {
                 HorizontalPager(state = pagerState) { page ->
-
-                    val compositionObject = viewModel.getLottieComposition(onBoardingPages[page].image)
-
-                    val composition by rememberLottieComposition(
-                        LottieCompositionSpec.RawRes(onBoardingPages[page].image)
-                    )
-
-                    val progress by animateLottieCompositionAsState(
-                        composition = composition,
-                        iterations = LottieConstants.IterateForever,
-                    )
-
+                    val compositionObject = addLottieComposition(onBoardingPages[page].image)
                     OnboardingPageContent(
                         page = onBoardingPages[page],
-                        composition = compositionObject,
-                        progress = progress
+                        composition = compositionObject
                     )
                 }
 
@@ -149,7 +135,9 @@ fun OnBoardingContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 if (pagerState.currentPage > 0) {
-                    TextButton(onClick = {
+                    TextButton(
+                        modifier = Modifier.testTag("back_button"),
+                        onClick = {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(pagerState.currentPage - 1)
                         }
@@ -158,7 +146,9 @@ fun OnBoardingContent(
                     }
                 }
 
-                Button(onClick = {
+                Button(
+                    modifier = Modifier.testTag("next_button"),
+                    onClick = {
                     coroutineScope.launch {
                         if (pagerState.currentPage == onBoardingPages.lastIndex) {
                             onEvent(OnBoardingEvent.Finish)
@@ -178,23 +168,13 @@ fun OnBoardingContent(
 
 
 @Composable
-fun OnboardingPageContent(page: OnBoardingModel, composition: LottieComposition?, progress: Float) {
+fun OnboardingPageContent(page: OnBoardingModel, composition: LottieComposition) {
     Column(Modifier.padding(spaceMedium),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-        if(composition == null) {
-            Box(
-                modifier = Modifier
-                    .size(250.dp)
-                    .shimmerEffect()
-            )
-        }else{
-            LottieAnimation(
-                composition = composition,
-                progress = { progress }, // ✅ Use animated progress
-                modifier = Modifier.size(250.dp)
-            )
-        }
+        verticalArrangement = Arrangement.Center)
+    {
+
+        AnimatedPreloader(sizeLottie = 250.dp, composition = composition)
 
         Spacer(modifier = Modifier.height(spaceLarge))
         Text(text = stringResource(id = page.title), style = MaterialTheme.typography.headlineMedium)
@@ -213,20 +193,6 @@ fun Indicator(isSelected: Boolean) {
             .background(
                 if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
             )
-    )
-}
-
-@Composable
-fun Modifier.shimmerEffect(): Modifier {
-    return this.background(
-        brush = Brush.linearGradient(
-            colors = listOf(
-                Color.LightGray.copy(alpha = 0.9f),
-                Color.LightGray.copy(alpha = 0.3f),
-                Color.LightGray.copy(alpha = 0.9f)
-            )
-        ),
-        shape = RoundedCornerShape(8.dp)
     )
 }
 

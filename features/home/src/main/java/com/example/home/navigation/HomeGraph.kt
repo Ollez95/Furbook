@@ -2,9 +2,8 @@ package com.example.home.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.home.ui.chat.ChatScreen
-import com.example.home.ui.chat.HomeScreen
-import com.example.home.ui.chat.InboxScreen
+import com.example.home.ui.pet_buddies.PetBuddiesScreen
+import com.example.home.ui.home.HomeScreen
 import com.example.navigation.HomeNavigation
 
 fun NavGraphBuilder.homeGraph() {
@@ -12,10 +11,10 @@ fun NavGraphBuilder.homeGraph() {
         HomeScreen()
     }
     composable<HomeNavigation.Inbox> {
-        InboxScreen()
+        HomeScreen()
     }
-    composable<HomeNavigation.Chat> {
-        ChatScreen()
+    composable<HomeNavigation.PetBuddies> {
+        PetBuddiesScreen()
     }
 }
 

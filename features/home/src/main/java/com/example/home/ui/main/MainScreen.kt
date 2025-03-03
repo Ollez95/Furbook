@@ -29,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.home.navigation.homeGraph
 import com.example.home.ui.composables.MainBottomNavigationBar
 import com.example.home.ui.composables.MainDrawer
+import com.example.home.ui.composables.TopNavigationBar
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.HomeNavigation
 import com.example.navigation.navigateToDestinationCleaningStack
@@ -90,19 +91,6 @@ fun MainContent(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopNavigationBar(onEvent: (MainEvent) -> Unit) {
-    TopAppBar(
-        title = { Text("Furbook", style = MaterialTheme.typography.headlineMedium) },
-        navigationIcon = {
-            IconButton(onClick = { onEvent(MainEvent.OpenCloseDrawer) }) {
-                Icon(Icons.Default.Menu, contentDescription = "Menu")
-            }
-        }
-    )
 }
 
 @Preview(name = "Light Mode", showBackground = true)

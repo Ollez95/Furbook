@@ -78,7 +78,7 @@ sealed class BottomNavItem(
     )
 
     data object Chat : BottomNavItem(
-        route = HomeNavigation.Chat,
+        route = HomeNavigation.PetBuddies,
         title = "Pet Buddies",
         iconSelected = Icons.Filled.Pets,
         iconNotSelected = Icons.Outlined.Pets

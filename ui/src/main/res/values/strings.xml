@@ -6,4 +6,13 @@
     <string name="on_boarding_description_2">Lorem ipsum odor amet, consectetuer adipiscing elit. Ante malesuada velit at dolor fames velit integer 2</string>
     <string name="on_boarding_title_3">Lorem ipsum odor amet 3</string>
     <string name="on_boarding_description_3">Lorem ipsum odor amet, consectetuer adipiscing elit. Ante malesuada velit at dolor fames velit integer 3</string>
+
+
+    // Animal names
+    <string name="pet_buddies_dog_title">Dog</string>">
+    <string name="pet_buddies_cat_title">Cat</string>
+    <string name="pet_buddies_bird_title">Bird</string>
+    <string name="pet_buddies_fish_title">Fish</string>
+    <string name="pet_buddies_hamster_title">Hamster</string>
+    <string name="pet_buddies_rabbit_title">Rabbit</string>
 </resources>

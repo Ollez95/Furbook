@@ -33,7 +33,7 @@ sealed class HomeNavigation : NavigationDestination {
     data object Main: HomeNavigation()
 
     @Serializable
-    data object Chat: HomeNavigation()
+    data object PetBuddies: HomeNavigation()
 
     @Serializable
     data object Inbox: HomeNavigation()

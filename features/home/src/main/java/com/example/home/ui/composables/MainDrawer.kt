@@ -53,7 +53,7 @@ fun MainDrawer(
         gesturesEnabled = drawerState.isOpen,
         drawerContent = {
             ModalDrawerSheet(
-                modifier = Modifier.fillMaxWidth(0.7f)
+                modifier = Modifier.fillMaxWidth(0.8f)
             ) {
                 Column(
                     modifier = Modifier

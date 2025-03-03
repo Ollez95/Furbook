@@ -1,14 +1,13 @@
-package com.example.home.ui.pet_buddies
+package com.example.home.ui.pet_buddies.pet_posts
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.home.ui.main.MainState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -16,9 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PetBuddiesViewModel @Inject constructor(
-
-): ViewModel() {
+class PetBuddiesViewModel @Inject constructor() : ViewModel() {
 
     private val _state = MutableStateFlow(PetBuddiesState())
     val state: StateFlow<PetBuddiesState> = _state
@@ -28,6 +25,9 @@ class PetBuddiesViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = PetBuddiesState()
         )
+
+    private val _eventFlow = MutableSharedFlow<PetBuddiesEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     private fun loadData() {
         viewModelScope.launch {
@@ -46,7 +46,7 @@ class PetBuddiesViewModel @Inject constructor(
         }
     }
 
-    private fun refreshData(){
-
+    private fun refreshData() {
+        // NOthing for now
     }
 }

@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.core.domain.home.petbuddies.model.AnimalPostModel
-import com.example.home.ui.pet_buddies.PetBuddiesEvent
-import com.example.home.ui.pet_buddies.PetBuddiesState
+import com.example.home.ui.pet_buddies.pet_posts.PetBuddiesEvent
+import com.example.home.ui.pet_buddies.pet_posts.PetBuddiesState
 
 @Composable
 fun PetPostList(state: PetBuddiesState, onEvent: (PetBuddiesEvent) -> Unit = {}) {

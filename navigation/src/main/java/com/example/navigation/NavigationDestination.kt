@@ -36,5 +36,8 @@ sealed class HomeNavigation : NavigationDestination {
     data object PetBuddies: HomeNavigation()
 
     @Serializable
+    data object PetAddPost: HomeNavigation()
+
+    @Serializable
     data object Inbox: HomeNavigation()
 }

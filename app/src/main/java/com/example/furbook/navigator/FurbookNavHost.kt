@@ -8,6 +8,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.authentication.navigation.authenticationGraph
 import com.example.home.ui.main.MainScreen
+import com.example.home.ui.pet_buddies.pet_add_post.PetAddPostScreen
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.HomeNavigation
 import com.example.navigation.NavigationDestination
@@ -29,6 +30,10 @@ fun FurbookNavigation(state: FurbookState) {
             composable<HomeNavigation.Main>{
                 MainScreen(appNavController = navController)
             }
+        }
+
+        composable<HomeNavigation.PetAddPost> {
+            PetAddPostScreen()
         }
     }
 }

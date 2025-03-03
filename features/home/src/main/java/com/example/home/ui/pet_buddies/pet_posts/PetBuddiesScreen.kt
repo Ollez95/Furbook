@@ -1,4 +1,4 @@
-package com.example.home.ui.pet_buddies
+package com.example.home.ui.pet_buddies.pet_posts
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -29,7 +29,7 @@ fun PetBuddiesScreen(viewModel: PetBuddiesViewModel = hiltViewModel()) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetBuddiesContent(state: PetBuddiesState, onEvent: (PetBuddiesEvent) -> Unit) {
+fun PetBuddiesContent(state: PetBuddiesState = PetBuddiesState(), onEvent: (PetBuddiesEvent) -> Unit = {}) {
 
     val pullRefreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
@@ -49,5 +49,5 @@ fun PetBuddiesContent(state: PetBuddiesState, onEvent: (PetBuddiesEvent) -> Unit
 @Preview
 @Composable
 private fun PetBuddiesScreenPreview() {
-    PetBuddiesScreen()
+    PetBuddiesContent()
 }

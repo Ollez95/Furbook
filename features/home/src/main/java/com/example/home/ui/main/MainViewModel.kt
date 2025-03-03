@@ -1,6 +1,5 @@
 package com.example.home.ui.main
 
-import androidx.compose.ui.unit.fontscaling.MathUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.authentication.login.usecase.LogoutAccountUseCase
@@ -43,6 +42,15 @@ class MainViewModel @Inject constructor(
         when (event) {
             is MainEvent.Logout -> logout()
             is MainEvent.OpenCloseDrawer -> viewModelScope.launch { _eventFlow.emit(MainEvent.OpenCloseDrawer) }
+            is MainEvent.NavigateToBottomSheetScreens ->
+                viewModelScope.launch { _state.update { it.copy(screen = event.mainScreenEnum) } }
+
+            is MainEvent.NavigateToPetAddPost -> {
+                viewModelScope.launch {
+                    _eventFlow.emit(MainEvent.NavigateToPetAddPost)
+                }
+            }
+
             else -> { /* Ignore */
             }
         }
@@ -51,7 +59,11 @@ class MainViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             val idResponse = getCurrentUserIdUseCase.invoke()
-            val id = if (idResponse is Response.Success) { idResponse.data } else { "" }
+            val id = if (idResponse is Response.Success) {
+                idResponse.data
+            } else {
+                ""
+            }
             val user = userRepository.getUserById(id)
             if (user is Response.Success) {
                 _state.update { it.copy(user = user.data) }
@@ -75,4 +87,6 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+
 }

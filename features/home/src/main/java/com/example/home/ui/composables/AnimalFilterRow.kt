@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.core.domain.home.petbuddies.model.AnimalEnum
 import com.example.core.domain.home.petbuddies.model.listAnimals
-import com.example.home.ui.pet_buddies.PetBuddiesEvent
+import com.example.home.ui.pet_buddies.pet_posts.PetBuddiesEvent
 
 @Composable
 fun AnimalFilter(

@@ -1,4 +1,4 @@
-package com.example.home.ui.pet_buddies
+package com.example.home.ui.pet_buddies.pet_posts
 
 import com.example.core.domain.home.petbuddies.model.AnimalEnum
 import com.example.core.domain.home.petbuddies.model.AnimalPostModel

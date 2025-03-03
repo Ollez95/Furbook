@@ -128,6 +128,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
             Timber.d(USER_WAS_LOGOUT)
             emit(Response.Success(true))
         } catch (e: Exception) {
+            clearLocalDatabase()
             Timber.e(e.message ?: "")
             emit(Response.Error(handleAuthenticationException(e).message))
         }

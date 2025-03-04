@@ -30,10 +30,9 @@ fun FurbookNavigation(state: FurbookState) {
             composable<HomeNavigation.Main>{
                 MainScreen(appNavController = navController)
             }
-        }
-
-        composable<HomeNavigation.PetAddPost> {
-            PetAddPostScreen()
+            composable<HomeNavigation.PetAddPost> {
+                PetAddPostScreen(navController)
+            }
         }
     }
 }

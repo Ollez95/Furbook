@@ -18,10 +18,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.home.navigation.homeGraph
+import com.example.home.navigation.bottomSheetGraph
 import com.example.home.ui.composables.MainBottomNavigationBar
 import com.example.home.ui.composables.MainDrawer
-import com.example.home.ui.composables.TopNavigationBar
+import com.example.home.ui.main.top_app_bar.MainTopNavigationBar
 import com.example.navigation.AuthenticationNavigation
 import com.example.navigation.HomeNavigation
 import com.example.navigation.navigateToDestination
@@ -30,7 +30,7 @@ import com.example.ui.theme.FurbookTheme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun MainScreen(viewModel: MainViewModel = hiltViewModel(), appNavController: NavController) {
+fun MainScreen(appNavController: NavController, viewModel: MainViewModel = hiltViewModel()) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -57,33 +57,33 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel(), appNavController: Nav
                     }
                 }
 
-                MainEvent.NavigateToPetAddPost -> appNavController
-                    .navigateToDestination(HomeNavigation.PetAddPost)
+                MainEvent.NavigateToPetAddPost -> appNavController.navigateToDestination(HomeNavigation.PetAddPost)
             }
         }
     }
 
-    MainContent(drawerState, state, viewModel::onEvent)
+    MainContent(drawerState, appNavController, state, viewModel::onEvent, )
 }
 
 @Composable
 fun MainContent(
     drawerState: DrawerState,
+    appNavController: NavController,
     state: MainState = MainState(),
     onEvent: (MainEvent) -> Unit = {},
-    navController: NavHostController = rememberNavController(),
+    bottomSheetController: NavHostController = rememberNavController(),
 ) {
     MainDrawer(user = state.user, onEvent = onEvent, drawerState = drawerState) {
         Scaffold(
-            topBar = { TopNavigationBar(state.screen, onEvent) },
-            bottomBar = { MainBottomNavigationBar(navController = navController) }
+            topBar = { MainTopNavigationBar(drawerState, appNavController, state.screen) },
+            bottomBar = { MainBottomNavigationBar(navController = bottomSheetController) }
         ) { innerPadding ->
             NavHost(
-                navController = navController,
+                navController = bottomSheetController,
                 startDestination = HomeNavigation.Main,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                homeGraph(onEvent)
+                bottomSheetGraph(onEvent)
             }
         }
     }
@@ -94,6 +94,7 @@ fun MainContent(
 @Composable
 private fun MainContentDrawerClosedPreview() {
     FurbookTheme {
-        MainContent(drawerState = rememberDrawerState(DrawerValue.Closed))
+        val navHostController = rememberNavController()
+        MainContent(drawerState = rememberDrawerState(DrawerValue.Closed), appNavController =  navHostController)
     }
 }

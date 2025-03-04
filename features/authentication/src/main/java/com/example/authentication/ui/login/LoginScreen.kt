@@ -54,8 +54,8 @@ import timber.log.Timber
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel(),
     navController: NavController,
+    viewModel: LoginViewModel = hiltViewModel(),
 ) {
     Timber.d("LoginScreen was created")
     val state by viewModel.state.collectAsStateWithLifecycle()

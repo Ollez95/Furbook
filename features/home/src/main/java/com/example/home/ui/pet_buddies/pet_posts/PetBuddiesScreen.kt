@@ -30,7 +30,6 @@ fun PetBuddiesScreen(viewModel: PetBuddiesViewModel = hiltViewModel()) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetBuddiesContent(state: PetBuddiesState = PetBuddiesState(), onEvent: (PetBuddiesEvent) -> Unit = {}) {
-
     val pullRefreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()

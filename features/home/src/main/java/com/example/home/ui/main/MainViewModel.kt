@@ -27,12 +27,8 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MainState())
-    val state: StateFlow<MainState> = _state
-        .onStart { loadData() }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = MainState()
+    val state: StateFlow<MainState> = _state.onStart { loadData() }.stateIn(
+            scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = MainState()
         )
 
     private val _eventFlow = MutableSharedFlow<MainEvent>()
@@ -42,8 +38,7 @@ class MainViewModel @Inject constructor(
         when (event) {
             is MainEvent.Logout -> logout()
             is MainEvent.OpenCloseDrawer -> viewModelScope.launch { _eventFlow.emit(MainEvent.OpenCloseDrawer) }
-            is MainEvent.NavigateToBottomSheetScreens ->
-                viewModelScope.launch { _state.update { it.copy(screen = event.mainScreenEnum) } }
+            is MainEvent.NavigateToBottomSheetScreens -> viewModelScope.launch { _state.update { it.copy(screen = event.mainScreenEnum) } }
 
             is MainEvent.NavigateToPetAddPost -> {
                 viewModelScope.launch {
@@ -87,6 +82,4 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
-
 }

@@ -25,7 +25,6 @@ sealed class AuthenticationNavigation : NavigationDestination {
 
 @Serializable
 sealed class HomeNavigation : NavigationDestination {
-
     @Serializable
     data object Home: HomeNavigation()
 

@@ -14,6 +14,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
+    private const val DATABASE_NAME = "furbook-database"
+
     @Provides
     @Singleton
     fun providesFurbookDatabase(
@@ -21,7 +23,7 @@ object DatabaseModule {
     ): FurbookDatabase {
         return Room.databaseBuilder(
             context, FurbookDatabase::class.java,
-            "furbook-database"
+            DATABASE_NAME
         ).build()
     }
 }

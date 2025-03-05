@@ -72,6 +72,7 @@ dependencies {
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgrest.kt)
     implementation(libs.supabase.auth.kt)
+    implementation(libs.supabase.storage)
     implementation(libs.supabase.ktor.client.engine)
     implementation(libs.supabase.ktor.client.cio)
 

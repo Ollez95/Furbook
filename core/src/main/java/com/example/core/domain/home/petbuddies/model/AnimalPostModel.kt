@@ -1,15 +1,15 @@
 package com.example.core.domain.home.petbuddies.model
 
-import androidx.annotation.DrawableRes
+import android.net.Uri
 import androidx.compose.ui.graphics.Color
-import com.example.ui.R
 
 data class AnimalPostModel(
     val id: String = "",
     val name: String = "",
-    @DrawableRes val imageUrl: Int = R.drawable.on_boarding_image_1,
-    val tags: Tag = Tag(),
-    val description: String = ""
+    val imageUrl: Uri = Uri.EMPTY,
+    val animal: String = "",
+    val tags: List<Tag> = emptyList(),
+    val description: String = "",
 )
 
 data class Tag(

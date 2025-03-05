@@ -75,4 +75,7 @@ dependencies {
 
     // timber
     implementation(libs.timber)
+
+    // LeakCanary
+    debugImplementation(libs.leakcanary)
 }

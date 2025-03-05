@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.1"
+coilCompose = "3.1.0"
 datastorePreferences = "1.1.2"
 ktorVersion = "3.1.0"
 lottieCompose = "6.6.2"
@@ -27,6 +28,7 @@ secretPlugin = "2.0.1"
 timber = "5.0.1"
 ksp = "2.1.10-1.0.30"
 lottie = "6.6.2"
+leakcanary = "2.14"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +39,7 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
@@ -44,6 +47,7 @@ mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 supabase-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorVersion" }
 supabase-ktor-client-engine = { module = "io.ktor:ktor-client", version.ref = "ktorVersion" }
 supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
+supabase-storage = { module = "io.github.jan-tennert.supabase:storage-kt" }
 supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
@@ -70,6 +74,8 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
+leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

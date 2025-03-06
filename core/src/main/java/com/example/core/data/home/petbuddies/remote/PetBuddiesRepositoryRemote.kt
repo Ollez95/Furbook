@@ -30,12 +30,8 @@ class PetBuddiesRepositoryRemote @Inject constructor(
     override fun createAnimalPost(animalPostModel: AnimalPostModel): Flow<Response<Boolean>> = flow {
         emit(Response.Loading)
         try {
-            val imageUrl = uploadImageToSupabase(animalPostModel.imageUrl)
-                ?: emit(Response.Error("Failed to upload image"))
-
-            val tagsJson = animalPostModel.tags.map {
-                mapOf("tag" to it.tag, "color" to it.color.toString())
-            }
+            val imageUrl = uploadImageToSupabase(animalPostModel.imageUrl) ?: emit(Response.Error("Failed to upload image"))
+            val tagsJson = animalPostModel.tags.map { mapOf("tag" to it.tag, "color" to it.color.toString()) }
             postgrest
                 .from(ANIMAL_POSTS)
                 .insert(
@@ -49,7 +45,6 @@ class PetBuddiesRepositoryRemote @Inject constructor(
                         "userId" to auth.currentSessionOrNull()?.user?.id
                     )
                 )
-
             emit(Response.Success(true))
         } catch (e: Exception) {
             emit(Response.Error(e.message ?: "An Unknown Error occurred"))

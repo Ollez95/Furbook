@@ -1,6 +1,7 @@
 package com.example.home.ui.pet_buddies.pet_add_post
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -28,6 +29,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,47 +43,45 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.core.domain.home.petbuddies.model.Tag
 import com.example.navigation.navigateBack
 
 
 @Composable
 fun PetAddPostScreen(navController: NavController, viewModel: PetAddPostViewModel = hiltViewModel()) {
+    val state = viewModel.state.collectAsStateWithLifecycle().value
+
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect {
             when (it) {
-                PetAddPostEvent.NavigateBack -> {
+                PetAddPostEvent.NavigateBack, PetAddPostEvent.OnAddPostSuccess -> {
                     navController.navigateBack()
                 }
             }
         }
     }
 
-    PetAddPostContent(viewModel::onEvent)
+
+    PetAddPostContent(onEvent = viewModel::onEvent)
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun PetAddPostContent(
+    state: PetBuddiesPostState = PetBuddiesPostState(),
     onEvent: (PetAddPostEvent) -> Unit,
 ) {
-    var description by remember { mutableStateOf("") }
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        selectedImageUri = uri
-    }
-
     val animalTypes = listOf("Dog", "Cat", "Bird", "Rabbit", "Other")
-    var selectedAnimalType by remember { mutableStateOf<String?>(null) }
-    var expanded by remember { mutableStateOf(false) }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent())
+    { uri -> onEvent(PetAddPostEvent.OnImageSelected(uri ?: Uri.EMPTY)) }
 
-    // Tag Management
-    var tags by remember { mutableStateOf(listOf("Cute", "Adopt", "Playful", "Rescue")) }
-    var selectedTags by remember { mutableStateOf(setOf<String>()) }
-    var newTag by remember { mutableStateOf("") }
+    ShowError(state, onEvent)
 
     Scaffold(
         topBar = {
@@ -105,26 +105,26 @@ fun PetAddPostContent(
             item {
                 // Animal Type Dropdown
                 ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
+                    expanded = state.isExpanded,
+                    onExpandedChange = { onEvent(PetAddPostEvent.OnExpandClicked(it)) }
                 ) {
                     OutlinedTextField(
-                        value = selectedAnimalType ?: "Select Animal Type",
+                        value = state.selectedAnimal ?: "Select Animal Type",
                         onValueChange = {},
                         readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor()
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(state.isExpanded) },
+                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
                     )
                     ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        expanded = state.isExpanded,
+                        onDismissRequest = { onEvent(PetAddPostEvent.OnExpandClicked(false)) }
                     ) {
                         animalTypes.forEach { animal ->
                             DropdownMenuItem(
                                 text = { Text(animal) },
                                 onClick = {
-                                    selectedAnimalType = animal
-                                    expanded = false
+                                    onEvent(PetAddPostEvent.OnAnimalSelected(animal))
+                                    onEvent(PetAddPostEvent.OnExpandClicked(false))
                                 }
                             )
                         }
@@ -135,8 +135,8 @@ fun PetAddPostContent(
             item {
                 // Description Input
                 OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
+                    value = state.description,
+                    onValueChange = { onEvent(PetAddPostEvent.OnDescriptionChanged(it)) },
                     label = { Text("Description") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = false,
@@ -154,9 +154,9 @@ fun PetAddPostContent(
                         .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (selectedImageUri != null) {
+                    if (state.imageUri != null) {
                         AsyncImage(
-                            model = selectedImageUri,
+                            model = state.imageUri,
                             contentDescription = "Selected Image",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
@@ -170,15 +170,15 @@ fun PetAddPostContent(
             item {
                 // User-Added Tag Input
                 OutlinedTextField(
-                    value = newTag,
-                    onValueChange = { newTag = it },
+                    value = state.newTag.tag,
+                    onValueChange = { onEvent(PetAddPostEvent.OnNewTagChanged(Tag(it))) },
                     label = { Text("Add New Tag") },
                     trailingIcon = {
                         IconButton(
                             onClick = {
-                                if (newTag.isNotBlank() && newTag !in tags) {
-                                    tags = tags + newTag.trim()
-                                    newTag = ""
+                                if (state.newTag.tag.isNotBlank() && state.newTag !in state.tags) {
+                                    onEvent(PetAddPostEvent.OnTagChanged(state.newTag))
+                                    onEvent(PetAddPostEvent.OnNewTagChanged(Tag("")))
                                 }
                             }
                         ) {
@@ -197,18 +197,14 @@ fun PetAddPostContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    tags.forEach { tag ->
+                    state.tags.forEach { tag ->
                         FilterChip(
-                            selected = selectedTags.contains(tag),
+                            selected = state.selectedTags.contains(tag),
                             onClick = {
-                                selectedTags = if (selectedTags.contains(tag)) {
-                                    selectedTags - tag
-                                } else {
-                                    selectedTags + tag
-                                }
+                                onEvent(PetAddPostEvent.OnTagSelected(tag))
                             },
-                            label = { Text(tag) },
-                            leadingIcon = if (selectedTags.contains(tag)) {
+                            label = { Text(tag.tag) },
+                            leadingIcon = if (state.selectedTags.contains(tag)) {
                                 { Icon(Icons.Default.Check, contentDescription = null) }
                             } else {
                                 null
@@ -222,9 +218,12 @@ fun PetAddPostContent(
                 // Submit Button
                 Button(
                     onClick = {
+                        onEvent(PetAddPostEvent.OnAddPostClicked)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = description.isNotEmpty() && selectedImageUri != null && selectedAnimalType != null
+                    enabled = state.description.isNotEmpty() &&
+                            state.imageUri != null &&
+                            state.selectedAnimal != null
                 ) {
                     Text("Post")
                 }
@@ -233,6 +232,13 @@ fun PetAddPostContent(
     }
 }
 
-
+@Composable
+private fun ShowError(state: PetBuddiesPostState, onEvent: (PetAddPostEvent) -> Unit) {
+    val context = LocalContext.current
+    state.errorMessage.let { message ->
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        onEvent(PetAddPostEvent.OnPostErrorReset)
+    }
+}
 
 

@@ -150,19 +150,24 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun getUserData(): User {
-        val currentIdResponse = getCurrentUserId()
-        val currentId = if (currentIdResponse is Response.Success) { currentIdResponse.data } else { "" }
-        val user = auth.currentSessionOrNull()?.user
-        val mail = user?.email ?: ""
+    override suspend fun getCurrentUser(): Response<User> {
+        return try{
+            val currentIdResponse = getCurrentUserId()
+            val currentId = if (currentIdResponse is Response.Success) { currentIdResponse.data } else { "" }
+            val user = auth.currentSessionOrNull()?.user
+            val mail = user?.email ?: ""
 
-        val username = user?.userMetadata?.transformToString("username") ?: "Anonymous"
-        Timber.d("User data: $currentId, $mail, $username")
-        return User(id = currentId, mail = mail, username = username)
+            val username = user?.userMetadata?.transformToString("username") ?: "Anonymous"
+            Timber.d("User data: $currentId, $mail, $username")
+            Response.Success(User(id = currentId, mail = mail, username = username))
+        } catch (e: Exception) {
+            Response.Error(e.message ?: "")
+        }
     }
 
     private suspend fun processRegisterUser() {
-        val user = getUserData()
+        val userResponse = getCurrentUser()
+        val user: User = if (userResponse is Response.Success) { userResponse.data } else { throw Exception(USER_ERROR_GETTING) }
         val registerResponse = userRepository.createUser(user)
         if (registerResponse is Response.Error) {
             throw Exception(registerResponse.message)
@@ -196,5 +201,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
         private const val USER_WAS_LOGIN = "User was successfully login"
         private const val PASSWORD_RECOVERY_EMAIL_SENT = "Password recovery email sent to "
         private const val TODO_ROLLBACK = "TODO: We need to handle rollback if user creation fails."
+        private const val USER_ERROR_GETTING = "User got an error getting created"
     }
 }

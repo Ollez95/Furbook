@@ -1,5 +1,6 @@
 package com.example.core.domain.authentication.repository
 
+import com.example.core.domain.shared.model.User
 import com.example.core.utils.Response
 import kotlinx.coroutines.flow.Flow
 
@@ -11,4 +12,5 @@ interface AuthenticationRepository {
     suspend fun isUserLoggedIn(): Response<Boolean>
     fun logout(): Flow<Response<Boolean>>
     suspend fun getCurrentUserId(): Response<String>
+    suspend fun getCurrentUser(): Response<User>
 }

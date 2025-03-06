@@ -1,6 +1,5 @@
 package com.example.home.ui.composables
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,10 +13,10 @@ import androidx.compose.ui.unit.dp
 import com.example.core.domain.home.petbuddies.model.AnimalPostModel
 import com.example.core.domain.home.petbuddies.model.Tag
 import com.example.home.ui.pet_buddies.pet_posts.PetBuddiesEvent
-import com.example.home.ui.pet_buddies.pet_posts.PetBuddiesState
+import com.example.home.ui.pet_buddies.pet_posts.PetBuddiesPostState
 
 @Composable
-fun PetPostList(state: PetBuddiesState, onEvent: (PetBuddiesEvent) -> Unit = {}) {
+fun PetPostList(state: PetBuddiesPostState, onEvent: (PetBuddiesEvent) -> Unit = {}) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
     ) {

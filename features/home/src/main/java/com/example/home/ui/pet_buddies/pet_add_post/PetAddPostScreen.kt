@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -55,7 +56,7 @@ import com.example.navigation.navigateBack
 
 @Composable
 fun PetAddPostScreen(navController: NavController, viewModel: PetAddPostViewModel = hiltViewModel()) {
-    val state = viewModel.state.collectAsStateWithLifecycle().value
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect {
@@ -68,7 +69,7 @@ fun PetAddPostScreen(navController: NavController, viewModel: PetAddPostViewMode
     }
 
 
-    PetAddPostContent(onEvent = viewModel::onEvent)
+    PetAddPostContent(state = state, onEvent = viewModel::onEvent)
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -218,7 +219,7 @@ fun PetAddPostContent(
                 // Submit Button
                 Button(
                     onClick = {
-                        onEvent(PetAddPostEvent.OnAddPostClicked)
+                        onEvent(PetAddPostEvent.OnAddPostClicked(state.imageUri ?: Uri.EMPTY))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = state.description.isNotEmpty() &&
@@ -228,6 +229,17 @@ fun PetAddPostContent(
                     Text("Post")
                 }
             }
+
+            item {
+                if (state.isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
         }
     }
 }
@@ -235,7 +247,7 @@ fun PetAddPostContent(
 @Composable
 private fun ShowError(state: PetBuddiesPostState, onEvent: (PetAddPostEvent) -> Unit) {
     val context = LocalContext.current
-    state.errorMessage.let { message ->
+    state.errorMessage?.let { message ->
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         onEvent(PetAddPostEvent.OnPostErrorReset)
     }

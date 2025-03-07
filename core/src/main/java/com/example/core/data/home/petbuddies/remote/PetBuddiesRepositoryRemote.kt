@@ -5,18 +5,15 @@ import com.example.core.domain.home.petbuddies.model.AnimalPostModel
 import com.example.core.domain.home.petbuddies.repository.PetBuddiesRepository
 import com.example.core.utils.Response
 import com.example.core.utils.util.ImageHelper
-import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import javax.inject.Inject
 
 class PetBuddiesRepositoryRemote @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage,
-    private val imageHelper: ImageHelper,
-    private val auth: Auth
+    private val imageHelper: ImageHelper
 ) : PetBuddiesRepository {
     override suspend fun getAnimalPosts(): Response<List<AnimalPostModel>> {
         return try {
@@ -27,27 +24,24 @@ class PetBuddiesRepositoryRemote @Inject constructor(
         }
     }
 
-    override fun createAnimalPost(animalPostModel: AnimalPostModel): Flow<Response<Boolean>> = flow {
-        emit(Response.Loading)
+    override suspend fun createAnimalPost(uri: Uri, animalPostModel: AnimalPostModel): Response<Boolean> {
         try {
-            val imageUrl = uploadImageToSupabase(animalPostModel.imageUrl) ?: emit(Response.Error("Failed to upload image"))
+            val imageUrl = uploadImageToSupabase(uri) ?: return  Response.Error("Failed to upload image")
             val tagsJson = animalPostModel.tags.map { mapOf("tag" to it.tag, "color" to it.color.toString()) }
             postgrest
                 .from(ANIMAL_POSTS)
                 .insert(
                     mapOf(
-                        "id" to animalPostModel.id,
                         "name" to animalPostModel.name,
                         "animal" to animalPostModel.animal,
                         "image_url" to imageUrl,
                         "description" to animalPostModel.description,
-                        "tags" to tagsJson,
-                        "userId" to auth.currentSessionOrNull()?.user?.id
+                        "tags" to tagsJson.toString(),
                     )
                 )
-            emit(Response.Success(true))
+            return Response.Success(true)
         } catch (e: Exception) {
-            emit(Response.Error(e.message ?: "An Unknown Error occurred"))
+            return Response.Error(e.message ?: "An Unknown Error occurred")
         }
     }
 
@@ -63,11 +57,12 @@ class PetBuddiesRepositoryRemote @Inject constructor(
 
             // Upload image
             val byteArray = imageHelper.uriToByteArray(uri) ?: return null
-            storage.upload(imagePath, byteArray)
+            storage.upload("${imagePath}.jpg", byteArray)
 
             // Generate a public URL
             storage.publicUrl(imagePath)
         } catch (e: Exception) {
+            Timber.e(e.message)
             null // Handle errors (e.g., no internet, permission issues)
         }
     }

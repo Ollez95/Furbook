@@ -73,7 +73,6 @@ fun PetPost(animalPostModel: AnimalPostModel) {
     }
 }
 
-
 @Preview
 @Composable
 private fun PetPostPreview() {

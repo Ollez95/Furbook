@@ -13,10 +13,10 @@ import androidx.compose.ui.unit.dp
 import com.example.core.domain.home.petbuddies.model.AnimalPostModel
 import com.example.core.domain.home.petbuddies.model.Tag
 import com.example.home.ui.pet_buddies.pet_posts.PetBuddiesEvent
-import com.example.home.ui.pet_buddies.pet_posts.PetBuddiesPostState
+import com.example.home.ui.pet_buddies.pet_posts.PetBuddiesState
 
 @Composable
-fun PetPostList(state: PetBuddiesPostState, onEvent: (PetBuddiesEvent) -> Unit = {}) {
+fun PetPostList(state: PetBuddiesState, onEvent: (PetBuddiesEvent) -> Unit = {}) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
     ) {

@@ -7,7 +7,6 @@ import com.example.core.domain.authentication.repository.usecase.GetCurrentUserU
 import com.example.core.domain.home.petbuddies.model.Tag
 import com.example.core.domain.home.petbuddies.usecases.CreateAnimalPostUseCase
 import com.example.core.utils.Response
-import com.example.home.ui.main.MainState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,12 +32,13 @@ class PetAddPostViewModel @Inject constructor(
         when (event) {
             is PetAddPostEvent.NavigateBack -> navigateBack()
             is PetAddPostEvent.OnExpandClicked -> onExpandedClicked(event.isExpanded)
+            is PetAddPostEvent.OnAnimalSelected -> onAnimalSelected(event.animal)
             is PetAddPostEvent.OnDescriptionChanged -> onDescriptionChanged(event.description)
             is PetAddPostEvent.OnImageSelected -> onImageSelected(event.imageUri)
             is PetAddPostEvent.OnNewTagChanged -> onNewTagChanged(event.newTag)
             is PetAddPostEvent.OnTagChanged -> onTagChanged(event.newTag)
             is PetAddPostEvent.OnTagSelected -> onTagSelected(event.tag)
-            is PetAddPostEvent.OnAddPostClicked -> onAddPostClicked()
+            is PetAddPostEvent.OnAddPostClicked -> onAddPostClicked(event.uri)
             is PetAddPostEvent.OnAddPostError -> onAddPostError(event.message)
             is PetAddPostEvent.OnPostErrorReset -> resetErrorMessage()
         }
@@ -52,7 +52,13 @@ class PetAddPostViewModel @Inject constructor(
 
     private fun onExpandedClicked(isExpanded: Boolean) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isExpanded = !isExpanded)
+            _state.value = _state.value.copy(isExpanded = isExpanded)
+        }
+    }
+
+    private fun onAnimalSelected(animal: String) {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(selectedAnimal = animal)
         }
     }
 
@@ -92,35 +98,21 @@ class PetAddPostViewModel @Inject constructor(
         }
     }
 
-    private fun onAddPostClicked() {
+    private fun onAddPostClicked(uri: Uri) {
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            try {
+                val user = (getCurrentUserUseCase() as? Response.Success)?.data ?: return@launch
+                val animalPost = _state.value.toAnimalPostModel(user.username)
 
-            val getCurrentUserIdUseCase = getCurrentUserUseCase.invoke()
-
-            val user = if (getCurrentUserIdUseCase is Response.Success) {
-                getCurrentUserIdUseCase.data
-            } else {
-                return@launch
-            }
-
-            val animalPost = _state.value.toAnimalPostModel(user.username)
-
-            createAnimalPostUseCase.invoke(animalPost).collect { response ->
-                when (response) {
-                    is Response.Loading -> {
-                        _state.update { it.copy(isLoading = true) }
-                    }
-
-                    is Response.Success -> {
-                        _state.update { it.copy(isLoading = false) }
-                        _eventFlow.emit(PetAddPostEvent.OnAddPostSuccess)  // Correct success event
-                    }
-
-                    is Response.Error -> {
-                        _state.update { it.copy(isLoading = false) }
-                        _eventFlow.emit(PetAddPostEvent.OnAddPostError(response.message))
-                    }
+                when (createAnimalPostUseCase(uri, animalPost)) {
+                    is Response.Success -> _eventFlow.emit(PetAddPostEvent.OnAddPostSuccess)
+                    else -> _eventFlow.emit(PetAddPostEvent.OnAddPostError("Failed to add post"))
                 }
+            } catch (e: Exception) {
+                _eventFlow.emit(PetAddPostEvent.OnAddPostError(e.message ?: "An Unknown Error occurred"))
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }

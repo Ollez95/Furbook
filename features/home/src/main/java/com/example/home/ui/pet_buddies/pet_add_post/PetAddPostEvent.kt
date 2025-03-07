@@ -12,7 +12,7 @@ interface PetAddPostEvent {
     data class OnTagSelected(val tag: Tag) : PetAddPostEvent
     data class OnNewTagChanged(val newTag: Tag) : PetAddPostEvent
     data class OnTagChanged(val newTag: Tag) : PetAddPostEvent
-    object OnAddPostClicked: PetAddPostEvent
+    data class OnAddPostClicked(val uri: Uri): PetAddPostEvent
     object OnAddPostSuccess: PetAddPostEvent
     data class OnAddPostError(val message: String): PetAddPostEvent
     object OnPostErrorReset: PetAddPostEvent

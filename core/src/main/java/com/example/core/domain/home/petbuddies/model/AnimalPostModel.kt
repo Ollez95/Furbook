@@ -1,18 +1,19 @@
 package com.example.core.domain.home.petbuddies.model
 
-import android.net.Uri
-import androidx.compose.ui.graphics.Color
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class AnimalPostModel(
     val id: String = "",
     val name: String = "",
-    val imageUrl: Uri = Uri.EMPTY,
+    val imageUrl: String = "",
     val animal: String = "",
     val tags: List<Tag> = emptyList(),
     val description: String = "",
 )
 
+@Serializable
 data class Tag(
     val tag: String = "",
-    val color: Color = Color.Black
+    val color: String = "color"
 )

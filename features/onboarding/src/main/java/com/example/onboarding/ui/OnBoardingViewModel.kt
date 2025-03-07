@@ -45,6 +45,5 @@ class OnBoardingViewModel @Inject constructor(
 
     fun getLottieComposition(animationResId: Int): LottieComposition {
         return lottieRepository.getLottieComposition(animationResId)
-
     }
 }

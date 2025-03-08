@@ -26,21 +26,23 @@ class PetBuddiesRepositoryRemote @Inject constructor(
 
     override suspend fun createAnimalPost(uri: Uri, animalPostModel: AnimalPostModel): Response<Boolean> {
         try {
-            val imageUrl = uploadImageToSupabase(uri) ?: return  Response.Error("Failed to upload image")
+            val imageUrl = uploadImageToSupabase(animalPostModel.name, uri) ?: return  Response.Error("Failed to upload image")
             val tagsJson = animalPostModel.tags.map { mapOf("tag" to it.tag, "color" to it.color.toString()) }
             postgrest
                 .from(ANIMAL_POSTS)
                 .insert(
                     mapOf(
+                        "user_id" to "auth().uid",
                         "name" to animalPostModel.name,
                         "animal" to animalPostModel.animal,
                         "image_url" to imageUrl,
                         "description" to animalPostModel.description,
-                        "tags" to tagsJson.toString(),
+                        "tags" to """{"key":"value"}""",
                     )
                 )
             return Response.Success(true)
         } catch (e: Exception) {
+            Timber.e(e.message)
             return Response.Error(e.message ?: "An Unknown Error occurred")
         }
     }
@@ -50,14 +52,14 @@ class PetBuddiesRepositoryRemote @Inject constructor(
 
     }
 
-    private suspend fun uploadImageToSupabase(uri: Uri): String? {
+    private suspend fun uploadImageToSupabase(username: String, uri: Uri): String? {
         return try {
             val storage = storage.from(BUCKET_NAME) // Replace with your bucket name
             val imagePath = BUCKET_FOLDER + uri.lastPathSegment
 
             // Upload image
             val byteArray = imageHelper.uriToByteArray(uri) ?: return null
-            storage.upload("${imagePath}.jpg", byteArray)
+            storage.upload(BUCKET_FOLDER + addPostImageName(username), byteArray)
 
             // Generate a public URL
             storage.publicUrl(imagePath)
@@ -66,6 +68,8 @@ class PetBuddiesRepositoryRemote @Inject constructor(
             null // Handle errors (e.g., no internet, permission issues)
         }
     }
+
+    private fun addPostImageName(username: String) = "${username}_${System.currentTimeMillis()}.jpg"
 
     companion object {
         const val ANIMAL_POSTS = "animal_posts"

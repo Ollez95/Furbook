@@ -1,5 +1,6 @@
 package com.example.home.ui.composables
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -14,9 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.example.core.domain.home.petbuddies.model.AnimalPostModel
 import com.example.core.domain.home.petbuddies.model.Tag
 
@@ -34,13 +38,21 @@ fun PetPost(animalPostModel: AnimalPostModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         AsyncImage(
-            model = animalPostModel.imageUrl,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(animalPostModel.imageUrl)
+                .crossfade(true)
+                .listener(
+                    onError = { _, throwable -> Log.e("CoilError",
+                        "Failed to load image", throwable.throwable) }
+                )
+                .build(),
             contentDescription = "Pet image",
             modifier = Modifier
                 .height(350.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
         )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(

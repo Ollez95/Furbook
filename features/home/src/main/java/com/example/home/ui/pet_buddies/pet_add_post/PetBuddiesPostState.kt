@@ -10,7 +10,6 @@ data class PetBuddiesPostState(
     val isExpanded: Boolean = false,
     val description: String = "",
     val imageUri: Uri? = Uri.EMPTY,
-    val animalType: String = "",
     val tags: List<Tag> = listOf(Tag("Cute"), Tag("Adopt"), Tag("Playful"), Tag("Rescue")),
     val selectedTags: Set<Tag> = emptySet(),
     val newTag: Tag = Tag(),
@@ -20,8 +19,7 @@ data class PetBuddiesPostState(
 fun PetBuddiesPostState.toAnimalPostModel(userName: String) =
     AnimalPostModel(
         name = userName,
-        animal = animalType,
+        animal = selectedAnimal ?: "",
         tags = selectedTags.toList(),
         description = description
     )
-

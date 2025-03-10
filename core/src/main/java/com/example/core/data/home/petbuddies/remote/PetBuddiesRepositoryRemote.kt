@@ -27,17 +27,16 @@ class PetBuddiesRepositoryRemote @Inject constructor(
     override suspend fun createAnimalPost(uri: Uri, animalPostModel: AnimalPostModel): Response<Boolean> {
         try {
             val imageUrl = uploadImageToSupabase(animalPostModel.name, uri) ?: return  Response.Error("Failed to upload image")
-            val tagsJson = animalPostModel.tags.map { mapOf("tag" to it.tag, "color" to it.color.toString()) }
+            val tagsJson = animalPostModel.tags.map { mapOf("tag" to it.tag, "color" to it.color) }
             postgrest
                 .from(ANIMAL_POSTS)
                 .insert(
                     mapOf(
-                        "user_id" to "auth().uid",
                         "name" to animalPostModel.name,
                         "animal" to animalPostModel.animal,
                         "image_url" to imageUrl,
                         "description" to animalPostModel.description,
-                        "tags" to """{"key":"value"}""",
+                        "tags" to tagsJson
                     )
                 )
             return Response.Success(true)
@@ -72,7 +71,7 @@ class PetBuddiesRepositoryRemote @Inject constructor(
     private fun addPostImageName(username: String) = "${username}_${System.currentTimeMillis()}.jpg"
 
     companion object {
-        const val ANIMAL_POSTS = "animal_posts"
+        const val ANIMAL_POSTS = "animal_post"
         const val BUCKET_NAME = "furbook_bucket"
         const val BUCKET_FOLDER = "posts_photo/"
     }

@@ -1,6 +1,5 @@
 package com.example.home.ui.composables
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -9,21 +8,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.core.domain.home.petbuddies.model.AnimalPostModel
 import com.example.core.domain.home.petbuddies.model.Tag
-import com.example.ui.R
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -33,13 +28,13 @@ fun PetPost(animalPostModel: AnimalPostModel) {
             .fillMaxWidth()
     ) {
         Text(
-            text = animalPostModel.name,
+            text = animalPostModel.username,
             style = MaterialTheme.typography.headlineMedium
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.on_boarding_image_1),
+        AsyncImage(
+            model = animalPostModel.imageUrl,
             contentDescription = "Pet image",
             modifier = Modifier
                 .height(350.dp)
@@ -77,7 +72,7 @@ fun PetPost(animalPostModel: AnimalPostModel) {
 @Composable
 private fun PetPostPreview() {
     PetPost(AnimalPostModel(
-        name = "Dog",
+        username = "Dog",
         description = "This is a dog",
         tags = listOf(
             Tag("Friendly"),

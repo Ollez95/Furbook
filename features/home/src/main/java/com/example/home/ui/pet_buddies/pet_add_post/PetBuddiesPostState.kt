@@ -18,7 +18,7 @@ data class PetBuddiesPostState(
 
 fun PetBuddiesPostState.toAnimalPostModel(userName: String) =
     AnimalPostModel(
-        name = userName,
+        username = userName,
         animal = selectedAnimal ?: "",
         tags = selectedTags.toList(),
         description = description

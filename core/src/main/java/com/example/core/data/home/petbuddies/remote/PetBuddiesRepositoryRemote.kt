@@ -1,7 +1,10 @@
 package com.example.core.data.home.petbuddies.remote
 
 import android.net.Uri
+import com.example.core.data.home.petbuddies.remote.model.AnimalPostModelDto
+import com.example.core.data.home.petbuddies.remote.model.toAnimalPostModel
 import com.example.core.domain.home.petbuddies.model.AnimalPostModel
+import com.example.core.domain.home.petbuddies.model.toAnimalPostModelDto
 import com.example.core.domain.home.petbuddies.repository.PetBuddiesRepository
 import com.example.core.utils.Response
 import com.example.core.utils.util.ImageHelper
@@ -17,32 +20,25 @@ class PetBuddiesRepositoryRemote @Inject constructor(
 ) : PetBuddiesRepository {
     override suspend fun getAnimalPosts(): Response<List<AnimalPostModel>> {
         return try {
-            val response = postgrest.from(ANIMAL_POSTS).select().decodeList<AnimalPostModel>()
-            return Response.Success(response)
+            val response = postgrest.from(ANIMAL_POSTS).select().decodeList<AnimalPostModelDto>()
+            val animalList = response.map { it.toAnimalPostModel() }
+            return Response.Success(animalList)
         } catch (e: Exception) {
             Response.Error(e.message ?: "An Unknown Error occurred")
         }
     }
 
     override suspend fun createAnimalPost(uri: Uri, animalPostModel: AnimalPostModel): Response<Boolean> {
-        try {
-            val imageUrl = uploadImageToSupabase(animalPostModel.name, uri) ?: return  Response.Error("Failed to upload image")
-            val tagsJson = animalPostModel.tags.map { mapOf("tag" to it.tag, "color" to it.color) }
+        return try {
+            val imageUrl = uploadImageToSupabase(animalPostModel.username, uri) ?: return Response.Error("Failed to upload image")
+            val animalPostModelFinal = animalPostModel.copy(imageUrl = imageUrl).toAnimalPostModelDto()
             postgrest
                 .from(ANIMAL_POSTS)
-                .insert(
-                    mapOf(
-                        "name" to animalPostModel.name,
-                        "animal" to animalPostModel.animal,
-                        "image_url" to imageUrl,
-                        "description" to animalPostModel.description,
-                        "tags" to tagsJson
-                    )
-                )
-            return Response.Success(true)
+                .insert(animalPostModelFinal)
+            Response.Success(true)
         } catch (e: Exception) {
-            Timber.e(e.message)
-            return Response.Error(e.message ?: "An Unknown Error occurred")
+            Timber.e("Error creating post: ${e.message}")
+            Response.Error(e.message ?: "An Unknown Error occurred")
         }
     }
 
@@ -54,11 +50,11 @@ class PetBuddiesRepositoryRemote @Inject constructor(
     private suspend fun uploadImageToSupabase(username: String, uri: Uri): String? {
         return try {
             val storage = storage.from(BUCKET_NAME) // Replace with your bucket name
-            val imagePath = BUCKET_FOLDER + uri.lastPathSegment
+            val imagePath = BUCKET_FOLDER + addPostImageName(username)
 
             // Upload image
             val byteArray = imageHelper.uriToByteArray(uri) ?: return null
-            storage.upload(BUCKET_FOLDER + addPostImageName(username), byteArray)
+            storage.upload(imagePath, byteArray)
 
             // Generate a public URL
             storage.publicUrl(imagePath)

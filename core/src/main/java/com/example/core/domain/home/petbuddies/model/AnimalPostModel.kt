@@ -1,19 +1,33 @@
 package com.example.core.domain.home.petbuddies.model
 
-import kotlinx.serialization.Serializable
+import com.example.core.data.home.petbuddies.remote.model.AnimalPostModelDto
+import com.example.core.data.home.petbuddies.remote.model.TagDto
 
-@Serializable
 data class AnimalPostModel(
     val id: String = "",
-    val name: String = "",
+    val createdAt: String = "",
+    val userId: String = "",
+    val username: String = "",
     val imageUrl: String = "",
     val animal: String = "",
     val tags: List<Tag> = emptyList(),
     val description: String = "",
 )
 
-@Serializable
 data class Tag(
     val tag: String = "",
     val color: String = "color"
+)
+
+fun AnimalPostModel.toAnimalPostModelDto() = AnimalPostModelDto(
+    username = username,
+    imageUrl = imageUrl,
+    animal = animal,
+    tags = tags.map { it.toTagDto() }, // Convert Tag -> TagDto
+    description = description
+)
+
+fun Tag.toTagDto() = TagDto(
+    tag = tag,
+    color = color
 )

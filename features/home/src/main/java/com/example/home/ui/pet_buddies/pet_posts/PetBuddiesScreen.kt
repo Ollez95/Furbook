@@ -6,16 +6,12 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.home.ui.composables.PetPostList
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -33,7 +29,6 @@ fun PetBuddiesScreen(viewModel: PetBuddiesViewModel = hiltViewModel()) {
 @Composable
 fun PetBuddiesContent(state: PetBuddiesState = PetBuddiesState(), onEvent: (PetBuddiesEvent) -> Unit = {}) {
     val pullRefreshState = rememberPullToRefreshState()
-    var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     DisposableEffect(Unit) {
@@ -42,11 +37,9 @@ fun PetBuddiesContent(state: PetBuddiesState = PetBuddiesState(), onEvent: (PetB
         }
     }
 
-    PullToRefreshBox(state = pullRefreshState, isRefreshing = isRefreshing, onRefresh = {
+    PullToRefreshBox(state = pullRefreshState, isRefreshing = state.isRefreshing, onRefresh = {
         coroutineScope.launch {
-            isRefreshing = true
-            delay(2000)
-            isRefreshing = false
+            onEvent(PetBuddiesEvent.OnRefresh)
         }
     }) {
         PetPostList(state, onEvent)

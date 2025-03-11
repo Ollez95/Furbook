@@ -5,7 +5,7 @@ import com.example.core.data.home.petbuddies.remote.model.TagDto
 
 data class AnimalPostModel(
     val id: String = "",
-    val createdAt: String = "",
+    val dateCreated: String = "",
     val userId: String = "",
     val username: String = "",
     val imageUrl: String = "",

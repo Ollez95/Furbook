@@ -27,31 +27,15 @@ class PetBuddiesViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(PetBuddiesState())
     val state: StateFlow<PetBuddiesState> = _state
-        .onStart { loadData() }
+        .onStart { fetchData(isRefreshing = false) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = PetBuddiesState()
         )
-
-    private fun loadData() {
-        viewModelScope.launch {
-            try {
-                when (val response = getAnimalPostsUseCase.invoke()) {
-                    is Response.Success -> { _state.update { it.copy(isLoading = false, animalPosts = response.data) } }
-                    else -> _eventFlow.emit(PetBuddiesEvent.OnAnimalPostsError("Failed to add post"))
-                }
-            } catch (e: Exception) {
-                _eventFlow.emit(PetBuddiesEvent.OnAnimalPostsError("Failed to add post"))
-            } finally {
-                _state.update { it.copy(isLoading = false) }
-            }
-        }
-    }
-
     fun onEvent(event: PetBuddiesEvent) {
         when (event) {
-            is PetBuddiesEvent.OnRefresh -> refreshData()
+            is PetBuddiesEvent.OnRefresh -> fetchData(isRefreshing = true)
             is PetBuddiesEvent.OnAnimalFilterClicked -> {
                 viewModelScope.launch {
                     _state.update { it.copy(animalFilters = event.animalType) }
@@ -60,11 +44,23 @@ class PetBuddiesViewModel @Inject constructor(
         }
     }
 
-    private fun refreshData() {
+    private fun fetchData(isRefreshing: Boolean) {
         viewModelScope.launch {
-            _state.update { it.copy(isRefreshing = true) }
-            loadData()
-            _state.update { it.copy(isRefreshing = false) }
+            _state.update { it.copy(isLoading = !isRefreshing, isRefreshing = isRefreshing) } // Update states based on context
+            try {
+                when (val response = getAnimalPostsUseCase.invoke()) {
+                    is Response.Success -> {
+                        _state.update { it.copy(animalPosts = response.data) }
+                    }
+                    else -> {
+                        _eventFlow.emit(PetBuddiesEvent.OnAnimalPostsError("Failed to load posts"))
+                    }
+                }
+            } catch (e: Exception) {
+                _eventFlow.emit(PetBuddiesEvent.OnAnimalPostsError(e.message ?: "An Unknown Error occurred"))
+            } finally {
+                _state.update { it.copy(isLoading = false, isRefreshing = false) } // Ensure both states are reset
+            }
         }
     }
 }

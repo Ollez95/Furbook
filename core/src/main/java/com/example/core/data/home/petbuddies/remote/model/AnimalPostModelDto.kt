@@ -2,6 +2,7 @@ package com.example.core.data.home.petbuddies.remote.model
 
 import com.example.core.domain.home.petbuddies.model.AnimalPostModel
 import com.example.core.domain.home.petbuddies.model.Tag
+import com.example.core.utils.time.TimeUtils.formatTimestamp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
@@ -25,7 +26,7 @@ data class TagDto(
 
 fun AnimalPostModelDto.toAnimalPostModel() = AnimalPostModel(
     id = id ?: "",
-    createdAt = createdAt ?: "",
+    dateCreated = formatTimestamp(createdAt ?: ""),
     userId = userId ?: "",
     username = username,
     imageUrl = imageUrl,

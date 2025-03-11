@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,17 +48,11 @@ fun PetPost(animalPostModel: AnimalPostModel) {
                 )
                 .build(),
             contentDescription = "Pet image",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .height(350.dp)
+                .height(450.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = animalPostModel.description,
-            style = MaterialTheme.typography.bodyLarge
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -77,6 +72,20 @@ fun PetPost(animalPostModel: AnimalPostModel) {
                 }
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = animalPostModel.description,
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = animalPostModel.dateCreated,
+            style = MaterialTheme.typography.bodySmall
+        )
+
     }
 }
 

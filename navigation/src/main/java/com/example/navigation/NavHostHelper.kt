@@ -1,7 +1,9 @@
 package com.example.navigation
 
 import android.annotation.SuppressLint
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import timber.log.Timber
 
 private const val THROTTLE_INTERVAL = 500L // Throttle time in milliseconds
@@ -50,7 +52,6 @@ fun NavController.navigateToDestinationCleaningStack(
     }
     logBackStack()
 }
-
 
 @SuppressLint("RestrictedApi")
 fun NavController.logBackStack() {

@@ -58,13 +58,13 @@ fun PetPost(animalPostModel: AnimalPostModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Display Tags
-        if (animalPostModel.tags.isNotEmpty()) {
+        if (animalPostModel.tags?.isNotEmpty() != false) {
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                animalPostModel.tags.forEach { tag ->
+                animalPostModel.tags?.forEach { tag ->
                     AssistChip(
                         onClick = { /* No action needed, just for display */ },
                         label = { Text(tag.tag) }

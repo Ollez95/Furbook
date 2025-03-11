@@ -14,7 +14,7 @@ data class AnimalPostModelDto(
     @SerialName("username") val username: String = "",
     @SerialName("image_url") val imageUrl: String = "",
     @SerialName("animal") val animal: String = "",
-    @SerialName("tags") val tags: List<TagDto> = emptyList(),
+    @SerialName("tags") val tags: List<TagDto>? = null,
     @SerialName("description") val description: String = ""
 )
 
@@ -31,7 +31,10 @@ fun AnimalPostModelDto.toAnimalPostModel() = AnimalPostModel(
     username = username,
     imageUrl = imageUrl,
     animal = animal,
-    tags = tags.map { it.toTag() },
+    tags = buildList {
+        add(Tag(tag = animal, color = "black"))
+        addAll(tags?.map { it.toTag() } ?: emptyList())
+    },
     description = description
 )
 

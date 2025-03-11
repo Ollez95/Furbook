@@ -10,7 +10,7 @@ data class AnimalPostModel(
     val username: String = "",
     val imageUrl: String = "",
     val animal: String = "",
-    val tags: List<Tag> = emptyList(),
+    val tags: List<Tag>? = emptyList(),
     val description: String = "",
 )
 
@@ -23,7 +23,7 @@ fun AnimalPostModel.toAnimalPostModelDto() = AnimalPostModelDto(
     username = username,
     imageUrl = imageUrl,
     animal = animal,
-    tags = tags.map { it.toTagDto() }, // Convert Tag -> TagDto
+    tags = tags?.map { it.toTagDto() } ?: emptyList(),
     description = description
 )
 

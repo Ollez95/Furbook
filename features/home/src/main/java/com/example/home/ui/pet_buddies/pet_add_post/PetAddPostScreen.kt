@@ -96,153 +96,159 @@ fun PetAddPostContent(
             )
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                // Animal Type Dropdown
-                ExposedDropdownMenuBox(
-                    expanded = state.isExpanded,
-                    onExpandedChange = { onEvent(PetAddPostEvent.OnExpandClicked(it)) }
-                ) {
-                    OutlinedTextField(
-                        value = state.selectedAnimal ?: "Select Animal Type",
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(state.isExpanded) },
-                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    )
-                    ExposedDropdownMenu(
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    // Animal Type Dropdown
+                    ExposedDropdownMenuBox(
                         expanded = state.isExpanded,
-                        onDismissRequest = { onEvent(PetAddPostEvent.OnExpandClicked(false)) }
+                        onExpandedChange = { onEvent(PetAddPostEvent.OnExpandClicked(it)) }
                     ) {
-                        animalTypes.forEach { animal ->
-                            DropdownMenuItem(
-                                text = { Text(animal) },
+                        OutlinedTextField(
+                            value = state.selectedAnimal ?: "Select Animal Type",
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(state.isExpanded) },
+                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = state.isExpanded,
+                            onDismissRequest = { onEvent(PetAddPostEvent.OnExpandClicked(false)) }
+                        ) {
+                            animalTypes.forEach { animal ->
+                                DropdownMenuItem(
+                                    text = { Text(animal) },
+                                    onClick = {
+                                        onEvent(PetAddPostEvent.OnAnimalSelected(animal))
+                                        onEvent(PetAddPostEvent.OnExpandClicked(false))
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                item {
+                    // Description Input
+                    OutlinedTextField(
+                        value = state.description,
+                        onValueChange = { onEvent(PetAddPostEvent.OnDescriptionChanged(it)) },
+                        label = { Text("Description") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = false,
+                        maxLines = 4
+                    )
+                }
+
+                item {
+                    // Image Picker
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clickable { launcher.launch("image/*") }
+                            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (state.imageUri != null) {
+                            AsyncImage(
+                                model = state.imageUri,
+                                contentDescription = "Selected Image",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        } else {
+                            Text("Tap to select an image", style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
+
+                item {
+                    // User-Added Tag Input
+                    OutlinedTextField(
+                        value = state.newTag.tag,
+                        onValueChange = { onEvent(PetAddPostEvent.OnNewTagChanged(Tag(it))) },
+                        label = { Text("Add New Tag") },
+                        trailingIcon = {
+                            IconButton(
                                 onClick = {
-                                    onEvent(PetAddPostEvent.OnAnimalSelected(animal))
-                                    onEvent(PetAddPostEvent.OnExpandClicked(false))
+                                    if (state.newTag.tag.isNotBlank() && state.newTag !in state.tags) {
+                                        onEvent(PetAddPostEvent.OnTagChanged(state.newTag))
+                                        onEvent(PetAddPostEvent.OnNewTagChanged(Tag("")))
+                                    }
+                                }
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = "Add Tag")
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+
+                item {
+                    // Tags Selection
+                    Text("Select Tags", style = MaterialTheme.typography.bodyLarge)
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        state.tags.forEach { tag ->
+                            FilterChip(
+                                selected = state.selectedTags.contains(tag),
+                                onClick = {
+                                    onEvent(PetAddPostEvent.OnTagSelected(tag))
+                                },
+                                label = { Text(tag.tag) },
+                                leadingIcon = if (state.selectedTags.contains(tag)) {
+                                    { Icon(Icons.Default.Check, contentDescription = null) }
+                                } else {
+                                    null
                                 }
                             )
                         }
                     }
                 }
+
+                item {
+                    // Submit Button
+                    Button(
+                        onClick = {
+                            onEvent(PetAddPostEvent.OnAddPostClicked(state.imageUri ?: Uri.EMPTY))
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = state.description.isNotEmpty() &&
+                                state.imageUri != null &&
+                                state.selectedAnimal != null
+                    ) {
+                        Text("Post")
+                    }
+                }
             }
 
-            item {
-                // Description Input
-                OutlinedTextField(
-                    value = state.description,
-                    onValueChange = { onEvent(PetAddPostEvent.OnDescriptionChanged(it)) },
-                    label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = false,
-                    maxLines = 4
-                )
-            }
-
-            item {
-                // Image Picker
+            // Show loading indicator when isLoading is true
+            if (state.isLoading) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clickable { launcher.launch("image/*") }
-                        .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp)),
+                        .fillMaxSize()
+                        .clickable(false) {
+
+                        }, // Prevent interactions
                     contentAlignment = Alignment.Center
                 ) {
-                    if (state.imageUri != null) {
-                        AsyncImage(
-                            model = state.imageUri,
-                            contentDescription = "Selected Image",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Text("Tap to select an image", style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-            }
-
-            item {
-                // User-Added Tag Input
-                OutlinedTextField(
-                    value = state.newTag.tag,
-                    onValueChange = { onEvent(PetAddPostEvent.OnNewTagChanged(Tag(it))) },
-                    label = { Text("Add New Tag") },
-                    trailingIcon = {
-                        IconButton(
-                            onClick = {
-                                if (state.newTag.tag.isNotBlank() && state.newTag !in state.tags) {
-                                    onEvent(PetAddPostEvent.OnTagChanged(state.newTag))
-                                    onEvent(PetAddPostEvent.OnNewTagChanged(Tag("")))
-                                }
-                            }
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = "Add Tag")
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-            }
-
-            item {
-                // Tags Selection
-                Text("Select Tags", style = MaterialTheme.typography.bodyLarge)
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    state.tags.forEach { tag ->
-                        FilterChip(
-                            selected = state.selectedTags.contains(tag),
-                            onClick = {
-                                onEvent(PetAddPostEvent.OnTagSelected(tag))
-                            },
-                            label = { Text(tag.tag) },
-                            leadingIcon = if (state.selectedTags.contains(tag)) {
-                                { Icon(Icons.Default.Check, contentDescription = null) }
-                            } else {
-                                null
-                            }
-                        )
-                    }
-                }
-            }
-
-            item {
-                // Submit Button
-                Button(
-                    onClick = {
-                        onEvent(PetAddPostEvent.OnAddPostClicked(state.imageUri ?: Uri.EMPTY))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = state.description.isNotEmpty() &&
-                            state.imageUri != null &&
-                            state.selectedAnimal != null
-                ) {
-                    Text("Post")
-                }
-            }
-
-            item {
-                if (state.isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
     }
 }
+
 
 @Composable
 private fun ShowError(state: PetBuddiesPostState, onEvent: (PetAddPostEvent) -> Unit) {

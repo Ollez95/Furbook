@@ -30,8 +30,8 @@ import com.example.ui.theme.FurbookTheme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun MainScreen(appNavController: NavController, viewModel: MainViewModel = hiltViewModel()) {
-
+fun MainScreen(appNavController: NavController,
+               viewModel: MainViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 

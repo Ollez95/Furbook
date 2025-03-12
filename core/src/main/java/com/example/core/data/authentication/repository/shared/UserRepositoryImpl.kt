@@ -12,12 +12,25 @@ import javax.inject.Singleton
 class UserRepositoryImpl @Inject constructor(
     private val localRepository: UserRepositoryLocal,
     private val remoteRepository: UserRepositoryRemote): UserRepository {
+
     override suspend fun getUserById(id: String): Response<User> {
         val localUser = localRepository.getUserById(id)
         if (localUser is Response.Success) {
             return localUser
         }
         val remoteUser = remoteRepository.getUserById(id)
+        if (remoteUser is Response.Success) {
+            return remoteUser
+        }
+        return Response.Error(GET_USER_ERROR)
+    }
+
+    override suspend fun getUser(): Response<User> {
+        val localUser = localRepository.getUser()
+        if (localUser is Response.Success) {
+            return localUser
+        }
+        val remoteUser = remoteRepository.getUser()
         if (remoteUser is Response.Success) {
             return remoteUser
         }

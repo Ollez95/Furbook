@@ -6,6 +6,7 @@ import com.example.core.domain.authentication.repository.UserRepository
 import com.example.core.domain.shared.model.User
 import com.example.core.domain.shared.model.toEntity
 import com.example.core.utils.Response
+import com.example.datastore.authentication.UserIdDatastore
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,10 +14,23 @@ import javax.inject.Singleton
 @Singleton
 class UserRepositoryLocal @Inject constructor(
     private val userDao: UserDao,
+    private val userIdDatastore: UserIdDatastore
 ) : UserRepository {
 
     override suspend fun getUserById(id: String): Response<User> {
         return try {
+            val result = userDao.getUser(id)?.toDomainModel() ?: User()
+            Timber.d(GET_USER_ID_SUCCESS + id)
+            Response.Success(result)
+        } catch (e: Exception) {
+            Timber.e(e.message)
+            Response.Error(e.message ?: ERROR_MESSAGE)
+        }
+    }
+
+    override suspend fun getUser(): Response<User> {
+        return try {
+            val id = userIdDatastore.getValueDataStoreOnce() ?: ""
             val result = userDao.getUser(id)?.toDomainModel() ?: User()
             Timber.d(GET_USER_ID_SUCCESS + id)
             Response.Success(result)

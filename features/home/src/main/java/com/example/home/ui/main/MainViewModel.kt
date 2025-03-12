@@ -3,8 +3,7 @@ package com.example.home.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.authentication.login.usecase.LogoutAccountUseCase
-import com.example.core.domain.authentication.repository.UserRepository
-import com.example.core.domain.authentication.shared.GetCurrentUserIdUseCase
+import com.example.core.domain.authentication.repository.usecase.GetUserUseCase
 import com.example.core.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,14 +21,13 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val logoutAccountUseCase: LogoutAccountUseCase,
-    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
-    private val userRepository: UserRepository,
+    private val getUserUseCase: GetUserUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = _state.onStart { loadData() }.stateIn(
-            scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = MainState()
-        )
+        scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = MainState()
+    )
 
     private val _eventFlow = MutableSharedFlow<MainEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -53,13 +51,7 @@ class MainViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
-            val idResponse = getCurrentUserIdUseCase.invoke()
-            val id = if (idResponse is Response.Success) {
-                idResponse.data
-            } else {
-                ""
-            }
-            val user = userRepository.getUserById(id)
+            val user = getUserUseCase.invoke()
             if (user is Response.Success) {
                 _state.update { it.copy(user = user.data) }
             }

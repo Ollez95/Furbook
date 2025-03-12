@@ -3,7 +3,7 @@ package com.example.home.ui.pet_buddies.pet_add_post
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.domain.authentication.repository.usecase.GetCurrentUserUseCase
+import com.example.core.domain.authentication.repository.usecase.GetUserUseCase
 import com.example.core.domain.home.petbuddies.model.Tag
 import com.example.core.domain.home.petbuddies.usecases.CreateAnimalPostUseCase
 import com.example.core.utils.Response
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PetAddPostViewModel @Inject constructor(
     private val createAnimalPostUseCase: CreateAnimalPostUseCase,
-    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val getUserUseCase: GetUserUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PetBuddiesPostState())
@@ -102,7 +102,7 @@ class PetAddPostViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
-                val user = (getCurrentUserUseCase() as? Response.Success)?.data ?: return@launch
+                val user = (getUserUseCase() as? Response.Success)?.data ?: return@launch
                 val animalPost = _state.value.toAnimalPostModel(user.username)
 
                 when (createAnimalPostUseCase(uri, animalPost)) {

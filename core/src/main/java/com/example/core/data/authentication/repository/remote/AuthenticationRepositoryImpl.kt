@@ -11,6 +11,7 @@ import com.example.core.utils.authentication.AuthenticationUtils.validateRegiste
 import com.example.core.utils.authentication.transformToString
 import com.example.datastore.authentication.AccessTokenDatastore
 import com.example.datastore.authentication.RefreshTokenDatastore
+import com.example.datastore.authentication.UserIdDatastore
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class AuthenticationRepositoryImpl @Inject constructor(
     private val accessTokenDataStore: AccessTokenDatastore,
     private val refreshTokenDatastore: RefreshTokenDatastore,
+    private val userIdDatastore: UserIdDatastore,
     private val auth: Auth,
     private val userRepository: UserRepository,
 ) : AuthenticationRepository {
@@ -138,7 +140,14 @@ class AuthenticationRepositoryImpl @Inject constructor(
         val session = auth.currentSessionOrNull() ?: throw Exception("Session is null")
         accessTokenDataStore.saveValueDatastore(session.accessToken)
         refreshTokenDatastore.saveValueDatastore(session.refreshToken)
+        saveUserIdToken(session.user?.id ?: "")
         Timber.d(TOKEN_WAS_SUCCESSFULLY_SAVED)
+    }
+
+    private suspend fun saveUserIdToken(userId: String){
+        if(userIdDatastore.getValueDataStoreOnce() == null){
+            userIdDatastore.saveValueDatastore(userId)
+        }
     }
 
     override suspend fun getCurrentUserId(): Response<String> {
@@ -182,8 +191,10 @@ class AuthenticationRepositoryImpl @Inject constructor(
         if (result is Response.Error) {
             Timber.e(result.message)
         }
+
         accessTokenDataStore.clearValueDatastore()
         refreshTokenDatastore.clearValueDatastore()
+        userIdDatastore.clearValueDatastore()
     }
 
     companion object {

@@ -4,6 +4,7 @@ import com.example.core.domain.authentication.repository.UserRepository
 import com.example.core.domain.shared.model.User
 import com.example.core.utils.Response
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.from
 import timber.log.Timber
 import javax.inject.Inject
@@ -12,10 +13,27 @@ import javax.inject.Singleton
 @Singleton
 class UserRepositoryRemote @Inject constructor(
     private val client: SupabaseClient,
+    private val auth: Auth
 ) : UserRepository {
 
     override suspend fun getUserById(id: String): Response<User> {
         return try {
+            val result = client.from(USERS_DATABASE)
+                .select { filter { User::id eq id } }
+                .decodeSingle<User>()
+
+            Timber.d(GET_USER_ID_SUCCESS + id)
+            Response.Success(result)
+        } catch (e: Exception) {
+            Timber.e(e.message)
+            Response.Error(e.message ?: ERROR_MESSAGE)
+        }
+    }
+
+    override suspend fun getUser(): Response<User> {
+        return try {
+            val id = auth.currentUserOrNull()?.id ?: ""
+
             val result = client.from(USERS_DATABASE)
                 .select { filter { User::id eq id } }
                 .decodeSingle<User>()

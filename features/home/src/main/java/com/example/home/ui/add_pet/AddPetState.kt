@@ -13,7 +13,7 @@ data class AddPetState(
     val breed: String = "",
     val birthdate: LocalDate? = null,
     val gender: Gender = Gender.UNKNOWN,
-    val weight: String = "",
+    val weight: Float = 0f,
     val color: String = "",
     val microchipNumber: String = "",
     val imageUri: Uri? = null

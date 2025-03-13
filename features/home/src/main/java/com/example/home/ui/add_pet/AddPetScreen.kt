@@ -25,13 +25,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Help
-import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.outlined.Pets
@@ -55,6 +55,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,37 +76,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
+import com.example.home.ui.add_pet.AddPetEvent.OnMicroChipChanged
+import com.example.navigation.navigateBack
 import com.example.ui.R
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPetScreen(
+    navController: NavController,
     viewModel: AddPetViewModel = hiltViewModel(),
-    onPetAdded: () -> Unit = {},
-    onNavigateBack: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
-    /*LaunchedEffect(state.isSuccess) {
-        if (state.isSuccess) {
-            Toast.makeText(context, "Pet added successfully", Toast.LENGTH_SHORT).show()
-            onPetAdded()
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                AddPetEvent.OnNavigateBack -> navController.navigateBack()
+            }
         }
-    }*/
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Add New Pet") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = { viewModel.onEvent(AddPetEvent.OnNavigateBack) }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -114,16 +117,7 @@ fun AddPetScreen(
         AddPetContent(
             modifier = Modifier.padding(paddingValues),
             state = state,
-            onNameChange = {},
-            onTypeChange = {},
-            onBreedChange = {},
-            onBirthdateChange = {},
-            onGenderChange = {},
-            onWeightChange = {},
-            onColorChange = {},
-            onMicrochipChange = {},
-            onImageUriChange = {},
-            onSubmit = {}
+            viewModel::onEvent
         )
     }
 }
@@ -133,16 +127,7 @@ fun AddPetScreen(
 fun AddPetContent(
     modifier: Modifier = Modifier,
     state: AddPetState,
-    onNameChange: (String) -> Unit,
-    onTypeChange: (PetType) -> Unit,
-    onBreedChange: (String) -> Unit,
-    onBirthdateChange: (LocalDate) -> Unit,
-    onGenderChange: (Gender) -> Unit,
-    onWeightChange: (String) -> Unit,
-    onColorChange: (String) -> Unit,
-    onMicrochipChange: (String) -> Unit,
-    onImageUriChange: (Uri?) -> Unit,
-    onSubmit: () -> Unit
+    onEvent: AddPetEvent.() -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val datePickerState = rememberDatePickerState()
@@ -150,7 +135,7 @@ fun AddPetContent(
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { onImageUriChange(it) }
+        uri?.let { onEvent(AddPetEvent.OnImageUriChanged(it)) }
     }
 
     Column(
@@ -209,7 +194,7 @@ fun AddPetContent(
         // Name
         OutlinedTextField(
             value = state.name,
-            onValueChange = onNameChange,
+            onValueChange = { onEvent(AddPetEvent.OnNameChanged(it)) },
             label = { Text("Pet Name") },
             isError = state.nameError != null,
             supportingText = state.nameError?.let { { Text(it) } },
@@ -228,7 +213,7 @@ fun AddPetContent(
 
         PetTypeSelector(
             selectedType = state.type,
-            onTypeSelected = onTypeChange,
+            onTypeSelected = { onEvent(AddPetEvent.OnTypeChanged(it)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -237,7 +222,7 @@ fun AddPetContent(
         // Breed
         OutlinedTextField(
             value = state.breed,
-            onValueChange = onBreedChange,
+            onValueChange = { onEvent(AddPetEvent.OnBreedChanged(it)) },
             label = { Text("Breed") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
@@ -271,11 +256,11 @@ fun AddPetContent(
                     TextButton(
                         onClick = {
                             datePickerState.selectedDateMillis?.let {
-                                onBirthdateChange(
+                                onEvent(AddPetEvent.OnBirthdateChanged(
                                     Instant.ofEpochMilli(it)
                                         .atZone(ZoneId.systemDefault())
                                         .toLocalDate()
-                                )
+                                ))
                             }
                             showDatePicker = false
                         }
@@ -297,7 +282,7 @@ fun AddPetContent(
 
         GenderSelector(
             selectedGender = state.gender,
-            onGenderSelected = onGenderChange,
+            onGenderSelected = { onEvent(AddPetEvent.OnGenderChanged(it)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -313,8 +298,8 @@ fun AddPetContent(
 
         // Weight
         OutlinedTextField(
-            value = state.weight,
-            onValueChange = onWeightChange,
+            value = state.weight.toString(),
+            onValueChange = { onEvent(AddPetEvent.OnWeightChanged(it.toFloat())) },
             label = { Text("Weight (kg)") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
@@ -331,7 +316,7 @@ fun AddPetContent(
         // Color
         OutlinedTextField(
             value = state.color,
-            onValueChange = onColorChange,
+            onValueChange = { onEvent(AddPetEvent.OnColorChanged(it)) },
             label = { Text("Color") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
@@ -347,7 +332,7 @@ fun AddPetContent(
         // Microchip number
         OutlinedTextField(
             value = state.microchipNumber,
-            onValueChange = onMicrochipChange,
+            onValueChange = { onEvent(OnMicroChipChanged(it)) },
             label = { Text("Microchip Number (Optional)") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -356,7 +341,7 @@ fun AddPetContent(
 
         // Submit button
         Button(
-            onClick = onSubmit,
+            onClick = { onEvent(AddPetEvent.OnSubmit(state)) },
             modifier = Modifier.fillMaxWidth(),
             enabled = !state.isLoading
         ) {
@@ -387,7 +372,7 @@ fun AddPetContent(
 fun PetTypeSelector(
     selectedType: PetType,
     onTypeSelected: (PetType) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         Text(
@@ -436,7 +421,7 @@ fun PetTypeSelector(
 fun PetTypeCard(
     type: PetType,
     selected: Boolean,
-    onSelect: () -> Unit
+    onSelect: () -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -485,6 +470,7 @@ fun PetTypeCard(
                             contentScale = ContentScale.Fit
                         )
                     }
+
                     PetType.CAT -> {
                         Image(
                             painter = painterResource(id = R.drawable.cat_filter),
@@ -493,6 +479,7 @@ fun PetTypeCard(
                             contentScale = ContentScale.Fit
                         )
                     }
+
                     PetType.BIRD -> {
                         Image(
                             painter = painterResource(id = R.drawable.bird_filter),
@@ -501,6 +488,7 @@ fun PetTypeCard(
                             contentScale = ContentScale.Fit
                         )
                     }
+
                     PetType.OTHER -> {
                         Icon(
                             imageVector = Icons.Outlined.Pets,
@@ -550,13 +538,13 @@ fun PetTypeCard(
 fun PetTypeOption(
     type: PetType,
     selected: Boolean,
-    onSelect: () -> Unit
+    onSelect: () -> Unit,
 ) {
     val icon = when (type) {
         PetType.DOG -> Icons.Default.Pets
         PetType.CAT -> Icons.Default.Pets
         PetType.BIRD -> Icons.Default.Air
-        PetType.OTHER -> Icons.Default.Help
+        PetType.OTHER -> Icons.AutoMirrored.Filled.Help
     }
 
     val label = when (type) {
@@ -599,7 +587,7 @@ fun PetTypeOption(
 fun GenderSelector(
     selectedGender: Gender,
     onGenderSelected: (Gender) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         Text(
@@ -641,7 +629,7 @@ fun GenderCard(
     gender: Gender,
     selected: Boolean,
     onSelect: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val backgroundColor = if (selected) {
         when (gender) {
@@ -705,6 +693,7 @@ fun GenderCard(
                         tint = textColor
                     )
                 }
+
                 Gender.FEMALE -> {
                     Icon(
                         imageVector = Icons.Rounded.Female,
@@ -713,6 +702,7 @@ fun GenderCard(
                         tint = textColor
                     )
                 }
+
                 Gender.UNKNOWN -> {
                     Icon(
                         imageVector = Icons.Rounded.QuestionMark,
@@ -752,5 +742,5 @@ fun GenderCard(
 @Preview
 @Composable
 private fun AddPetScreenPreview() {
-    AddPetScreen()
+    AddPetScreen(rememberNavController())
 }

@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import com.example.authentication.ui.composables.EmailOutlinedTextField
 import com.example.authentication.ui.composables.PasswordWithoutIconOutlinedTextField
 import com.example.navigation.AuthenticationNavigation
+import com.example.navigation.BottomSheetNavigation
 import com.example.navigation.HomeNavigation
 import com.example.navigation.navigateBack
 import com.example.navigation.navigateToDestinationCleaningStack
@@ -58,7 +59,7 @@ fun RegisterScreen(
             when (event) {
                 RegisterEvent.RegisterSuccess -> navController.navigateToDestinationCleaningStack(
                     navigationToClean = AuthenticationNavigation.Register,
-                    navigateToDestination = HomeNavigation.Main)
+                    navigateToDestination = BottomSheetNavigation.Main)
                 is RegisterEvent.RegisterError -> snackBarHostState.showSnackbar(event.message)
                 RegisterEvent.NavigateToLogin -> navController.navigateBack()
             }

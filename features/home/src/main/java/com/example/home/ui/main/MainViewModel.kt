@@ -37,15 +37,7 @@ class MainViewModel @Inject constructor(
             is MainEvent.Logout -> logout()
             is MainEvent.OpenCloseDrawer -> viewModelScope.launch { _eventFlow.emit(MainEvent.OpenCloseDrawer) }
             is MainEvent.NavigateToBottomSheetScreens -> viewModelScope.launch { _state.update { it.copy(screen = event.mainScreenEnum) } }
-
-            is MainEvent.NavigateToPetAddPost -> {
-                viewModelScope.launch {
-                    _eventFlow.emit(MainEvent.NavigateToPetAddPost)
-                }
-            }
-
-            else -> { /* Ignore */
-            }
+            is MainEvent.NavigateToPetAddPost -> { viewModelScope.launch { _eventFlow.emit(MainEvent.NavigateToPetAddPost) } }
         }
     }
 

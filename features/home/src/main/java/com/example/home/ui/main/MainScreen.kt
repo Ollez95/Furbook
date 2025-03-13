@@ -23,6 +23,7 @@ import com.example.home.ui.composables.MainBottomNavigationBar
 import com.example.home.ui.composables.MainDrawer
 import com.example.home.ui.main.top_app_bar.MainTopNavigationBar
 import com.example.navigation.AuthenticationNavigation
+import com.example.navigation.BottomSheetNavigation
 import com.example.navigation.HomeNavigation
 import com.example.navigation.navigateToDestination
 import com.example.navigation.navigateToDestinationCleaningStack
@@ -44,7 +45,7 @@ fun MainScreen(appNavController: NavController,
             when (event) {
                 MainEvent.LogoutSuccess -> appNavController
                     .navigateToDestinationCleaningStack(
-                        navigationToClean = HomeNavigation.Main,
+                        navigationToClean = BottomSheetNavigation.Main,
                         navigateToDestination = AuthenticationNavigation.Login,
                         useTheSameInstance = false
                     )
@@ -80,10 +81,10 @@ fun MainContent(
         ) { innerPadding ->
             NavHost(
                 navController = bottomSheetController,
-                startDestination = HomeNavigation.Main,
+                startDestination = BottomSheetNavigation.Main,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                bottomSheetGraph(onEvent)
+                bottomSheetGraph(appNavController, onEvent)
             }
         }
     }

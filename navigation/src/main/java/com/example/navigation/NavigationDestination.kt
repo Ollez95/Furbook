@@ -25,18 +25,26 @@ sealed class AuthenticationNavigation : NavigationDestination {
 
 @Serializable
 sealed class HomeNavigation : NavigationDestination {
-    @Serializable
-    data object Home: HomeNavigation()
-
-    @Serializable
-    data object Main: HomeNavigation()
-
-    @Serializable
-    data object PetBuddies: HomeNavigation()
 
     @Serializable
     data object PetAddPost: HomeNavigation()
 
     @Serializable
-    data object Inbox: HomeNavigation()
+    data object AddPet: HomeNavigation()
+}
+
+@Serializable
+sealed class BottomSheetNavigation: NavigationDestination {
+
+    @Serializable
+    data object BottomNavigation: BottomSheetNavigation()
+
+    @Serializable
+    data object Main: BottomSheetNavigation()
+
+    @Serializable
+    data object PetBuddies: BottomSheetNavigation()
+
+    @Serializable
+    data object Inbox: BottomSheetNavigation()
 }

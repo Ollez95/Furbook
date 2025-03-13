@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.navigation.BottomSheetNavigation
 import com.example.navigation.HomeNavigation
 import com.example.navigation.NavigationDestination
 import com.example.navigation.navigateToDestinationCleaningStack
@@ -51,7 +52,7 @@ fun MainBottomNavigationBar(
                 onClick = {
                     if (!isSelected) {
                         navController.navigateToDestinationCleaningStack(
-                            navigationToClean = HomeNavigation.Main,
+                            navigationToClean = BottomSheetNavigation.Main,
                             navigateToDestination = item.route,
                             cleanCurrentNavigation = false,
                             useTheSameInstance = true,
@@ -72,20 +73,20 @@ sealed class BottomNavItem(
     val iconNotSelected: ImageVector,
 ) {
     data object Home : BottomNavItem(
-        route = HomeNavigation.Main,
+        route = BottomSheetNavigation.Main,
         title = "Home", iconSelected = Icons.Filled.Home,
         iconNotSelected = Icons.Outlined.Home
     )
 
     data object Chat : BottomNavItem(
-        route = HomeNavigation.PetBuddies,
+        route = BottomSheetNavigation.PetBuddies,
         title = "Pet Buddies",
         iconSelected = Icons.Filled.Pets,
         iconNotSelected = Icons.Outlined.Pets
     )
 
     data object Inbox : BottomNavItem(
-        route = HomeNavigation.Inbox,
+        route = BottomSheetNavigation.Inbox,
         title = "Inbox",
         iconSelected = Icons.Filled.Email,
         iconNotSelected = Icons.Outlined.Email

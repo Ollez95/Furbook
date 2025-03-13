@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.domain.authentication.repository.usecase.GetUserUseCase
 import com.example.core.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -16,9 +18,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getUserUseCase: GetUserUseCase
-): ViewModel()
-{
+    private val getUserUseCase: GetUserUseCase,
+) : ViewModel() {
+
+    private val _eventFlow = MutableSharedFlow<HomeEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state
         .onStart { loadData() }
@@ -26,7 +31,13 @@ class HomeViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = HomeState()
-    )
+        )
+
+    fun onEvent(event: HomeEvent) {
+        when (event) {
+            is HomeEvent.AddPetClicked -> viewModelScope.launch { _eventFlow.emit(HomeEvent.AddPetClicked) }
+        }
+    }
 
     private fun loadData() {
         viewModelScope.launch {

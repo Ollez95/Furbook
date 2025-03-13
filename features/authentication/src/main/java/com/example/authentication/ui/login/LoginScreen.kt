@@ -43,6 +43,7 @@ import com.example.authentication.ui.composables.PasswordOutlinedTextField
 import com.example.authentication.ui.composables.RegisterText
 import com.example.core.domain.authentication.login.models.LoginModel
 import com.example.navigation.AuthenticationNavigation
+import com.example.navigation.BottomSheetNavigation
 import com.example.navigation.HomeNavigation
 import com.example.navigation.navigateToDestination
 import com.example.navigation.navigateToDestinationCleaningStack
@@ -66,7 +67,7 @@ fun LoginScreen(
             when (event) {
                 is LoginEvent.LoginSuccess -> navController.navigateToDestinationCleaningStack(
                     AuthenticationNavigation.Login,
-                    HomeNavigation.Main,
+                    BottomSheetNavigation.Main,
                     saveCurrentState=false,
                     restorePreviousState = false)
                 is LoginEvent.LoginError -> snackBarHostState.showSnackbar(event.message)

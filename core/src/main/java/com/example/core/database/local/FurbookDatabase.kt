@@ -2,6 +2,7 @@ package com.example.core.database.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.example.core.database.local.dao.PetDao
 import com.example.core.database.local.dao.UserDao
 import com.example.core.database.local.model.UserEntity
 
@@ -11,4 +12,5 @@ import com.example.core.database.local.model.UserEntity
 )
 abstract class FurbookDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
+    abstract fun petDao(): PetDao
 }

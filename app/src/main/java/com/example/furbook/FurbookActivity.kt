@@ -28,7 +28,6 @@ class FurbookActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
-
             if (!state.isLoading) {
                 FurbookTheme(dynamicColor = false) {
                     FurbookNavigation(state)

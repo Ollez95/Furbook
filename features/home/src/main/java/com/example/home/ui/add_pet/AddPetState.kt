@@ -1,6 +1,8 @@
 package com.example.home.ui.add_pet
 
 import android.net.Uri
+import com.example.core.domain.home.add_pet.model.Gender
+import com.example.core.domain.home.add_pet.model.PetType
 import java.time.LocalDate
 
 data class AddPetState(
@@ -19,10 +21,3 @@ data class AddPetState(
     val imageUri: Uri? = null
 )
 
-enum class Gender {
-    MALE, FEMALE, UNKNOWN
-}
-
-enum class PetType {
-    DOG, CAT, BIRD, OTHER
-}

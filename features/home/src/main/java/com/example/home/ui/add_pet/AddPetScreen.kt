@@ -79,6 +79,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
+import com.example.core.domain.home.add_pet.model.Gender
+import com.example.core.domain.home.add_pet.model.PetType
 import com.example.home.ui.add_pet.AddPetEvent.OnMicroChipChanged
 import com.example.navigation.navigateBack
 import com.example.ui.R
@@ -530,56 +532,6 @@ fun PetTypeCard(
                 )
             }
         }
-    }
-}
-
-
-@Composable
-fun PetTypeOption(
-    type: PetType,
-    selected: Boolean,
-    onSelect: () -> Unit,
-) {
-    val icon = when (type) {
-        PetType.DOG -> Icons.Default.Pets
-        PetType.CAT -> Icons.Default.Pets
-        PetType.BIRD -> Icons.Default.Air
-        PetType.OTHER -> Icons.AutoMirrored.Filled.Help
-    }
-
-    val label = when (type) {
-        PetType.DOG -> "Dog"
-        PetType.CAT -> "Cat"
-        PetType.BIRD -> "Bird"
-        PetType.OTHER -> "Other"
-    }
-
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(
-                if (selected) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surfaceVariant
-            )
-            .clickable(onClick = onSelect)
-            .padding(vertical = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
-            else MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
-            else MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 
